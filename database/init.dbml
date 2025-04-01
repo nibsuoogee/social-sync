@@ -50,7 +50,7 @@ Table events {
 }
 Ref: events.proposed_by_user_id > users.id [delete: cascade]
 
-Ref calendar_events: events.id <> calendars.id // many-to-many
+Ref events_calendars: events.id <> calendars.id // many-to-many
 
 Table event_attendance {
   id integer [pk, increment, not null]
