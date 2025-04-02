@@ -2,6 +2,7 @@ import Elysia, { t } from "elysia";
 import { jwtConfig } from "../config/jwtConfig";
 import { UserDTO, userModel, userModelForLogin } from "../models/userModel";
 
+
 export const loginRouter = new Elysia().use(jwtConfig).post(
   "/login",
   async ({ body, error, jwt_auth }) => {

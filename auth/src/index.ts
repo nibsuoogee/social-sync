@@ -10,7 +10,6 @@ const app = new Elysia()
   .get("/", () => "Hello fom auth!")
   .use(registerRouter)
   .use(loginRouter)
-
   .listen(3001);
 
 console.log(

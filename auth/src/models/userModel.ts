@@ -44,6 +44,7 @@ export const userModelForLogin = t.Object({
 });
 export type UserModelForLogin = typeof userModelForLogin.static;
 
+
 export const userModel = t.Object({
   id: t.Number(),
   username: t.String(),
@@ -52,3 +53,4 @@ export const userModel = t.Object({
   created_at: t.Date(),
 });
 export type User = typeof userModel.static;
+
