@@ -31,6 +31,7 @@ services:
     environment:
       - PORT=3001 # We want to set the port in the environment variables
       - JWT_SECRET=secret # We want to set the JWT_SECRET in the environment variables. This must match the one in auth and backend!
+      - POSTGRES_URL=postgres://user:password@postgres:5432/projectdb
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.auth.rule=Host(`auth.localhost`)" # This is the backend service URL
@@ -67,6 +68,29 @@ services:
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls=true"
       - "traefik.http.services.backend.loadbalancer.server.port=3000"
+  postgres:
+    image: postgres:17.2
+    environment:
+      - TZ=Europe/Helsinki
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=projectdb
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db_data:/var/lib/postgresql/data
+    healthcheck: # Hey! We are checking that the postgres is up and running!
+      test: ["CMD-SHELL", "pg_isready -U user -d projectdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.postgres.rule=Host(`postgres.localhost`)"
+      - "traefik.http.routers.postgres.entrypoints=websecure"
+      - "traefik.http.routers.postgres.tls=true"
+      - "traefik.http.services.postgres.loadbalancer.server.port=5432"
+    networks:
+      - cloud_project
 
 networks:
   cloud_project:
