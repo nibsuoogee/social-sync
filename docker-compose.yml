@@ -32,6 +32,8 @@ services:
       - PORT=3001 # We want to set the port in the environment variables
       - JWT_SECRET=secret # We want to set the JWT_SECRET in the environment variables. This must match the one in auth and backend!
       - POSTGRES_URL=postgres://user:password@postgres:5432/projectdb
+    env_file:
+      - .env
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.auth.rule=Host(`auth.localhost`)" # This is the backend service URL
@@ -46,6 +48,8 @@ services:
     networks:
       - cloud_project # Note the network is the same as for traefik! Otherwise this won't work!
     command: bun dev -- --host # We want to add the --host so that we can access the frontend from outside the container
+    env_file:
+      - .env
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ui.rule=Host(`app.localhost`)" # This is the ui service URL
@@ -62,6 +66,8 @@ services:
     environment:
       - POSTGRES_URL=postgres://user:password@postgres:5432/projectdb # This is the database URL
       - JWT_SECRET=secret # We want to set the JWT_SECRET in the environment variables. This must match the one in auth and backend!
+    env_file:
+      - .env
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`backend.localhost`)" # This is the backend service URL

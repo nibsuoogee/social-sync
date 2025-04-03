@@ -5,4 +5,8 @@ WORKDIR /usr/src/app
 COPY package*.json .
 RUN bun install
 COPY . .
+
+# Install nodemon globally
+RUN bun add -g nodemon
+
 CMD ["bun", "dev"]
