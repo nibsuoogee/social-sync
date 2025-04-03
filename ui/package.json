@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "sh -c 'if [ \"$USE_NODEMON\" = \"true\" ]; then nodemon -L --watch src --ext ts,tsx,js,json,css --exec \"vite --host\"; else vite --host; fi'",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
