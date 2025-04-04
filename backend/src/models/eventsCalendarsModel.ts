@@ -1,5 +1,5 @@
+import { EventsCalendars } from "@shared/index";
 import { sql } from "bun";
-import { t } from "elysia";
 
 /**
  * Events-Calendars Many-to-Many Relationship Data Transfer Object
@@ -15,9 +15,3 @@ export const EventsCalendarsDTO = {
     return newRelation;
   },
 };
-
-export const eventsCalendarsModel = t.Object({
-  events_id: t.Integer(),
-  calendars_id: t.Integer(),
-});
-export type EventsCalendars = typeof eventsCalendarsModel.static;
