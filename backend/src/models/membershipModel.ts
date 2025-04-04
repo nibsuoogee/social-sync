@@ -9,7 +9,7 @@ export const MembershipDTO = {
     membership: MembershipModelForCreation
   ): Promise<Membership> => {
     const [newMembership] = await sql`
-      INSERT INTO calendars ${sql(membership)}
+      INSERT INTO calendar_membership ${sql(membership)}
       RETURNING *
     `;
     return newMembership;

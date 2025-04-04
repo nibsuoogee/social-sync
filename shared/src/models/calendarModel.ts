@@ -5,6 +5,7 @@ export const calendarModelForCreation = t.Object({
   description: t.String(),
   owner_user_id: t.Integer(), // get this from the jwt token
   is_group: t.Boolean(),
+  color: t.String(),
 });
 export type CalendarModelForCreation = typeof calendarModelForCreation.static;
 
@@ -15,5 +16,15 @@ export const calendarModel = t.Object({
   owner_user_id: t.Integer(), // get this from the jwt token
   is_group: t.Boolean(),
   created_at: t.Date(),
+  color: t.String(),
 });
 export type Calendar = typeof calendarModel.static;
+
+export const calendarModelForUserCreation = t.Object({
+  name: t.String(),
+  description: t.String(),
+  is_group: t.Boolean(),
+  color: t.String(),
+});
+export type CalendarModelForUserCreation =
+  typeof calendarModelForUserCreation.static;

@@ -1,1 +1,4 @@
-export const placeholder: number = 1;
+export type jwtObject = {
+  id: number;
+  //permissions: string;
+};
