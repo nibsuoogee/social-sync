@@ -5,6 +5,7 @@ import { CalendarDTO } from "../models/calendarModel";
 import {
   CalendarModelForCreation,
   CalendarModelForUserCreation,
+  getRandomColor,
   jwtObject,
   MembershipModelForCreation,
 } from "@shared/index";
@@ -31,7 +32,7 @@ export const calendarRouter = new Elysia()
         }: {
           body: CalendarModelForUserCreation;
           user: jwtObject;
-          error: unknown;
+          error: any;
         }) => {
           // 1) use calendarModel to create a new group calendar for the user
           const calendarForCreation: CalendarModelForCreation = {
@@ -45,16 +46,20 @@ export const calendarRouter = new Elysia()
             calendarForCreation
           );
 
+          if (!calendar) return error(500, "Failed to create calendar");
+
           // 2) use membershipModel to create a new membership
           const membershipForCreation: MembershipModelForCreation = {
             calendar_id: calendar.id,
             user_id: user.id,
             role: "owner",
-            color: body.color,
+            color: getRandomColor(),
           };
           const membership = MembershipDTO.createMembership(
             membershipForCreation
           );
+
+          if (!membership) return error(500, "Failed to create membership");
 
           return { calendar_id: calendar.id };
         }
