@@ -1,11 +1,21 @@
 import Elysia, { t } from "elysia";
-import { UserDTO, userModel, userModelForSignup } from "../models/userModel";
+import { UserDTO } from "../models/userModel";
 import { jwtConfig } from "../config/jwtConfig";
+import { UserModelForRegistration } from "@shared/index";
 
-export const registerRouter = new Elysia().use(jwtConfig).post(
-  "/register",
-  async ({ body, error, jwt_auth }) => {
-    try {
+export const registerRouter = new Elysia()
+  .use(jwtConfig)
+  .post(
+    "/register",
+    async ({
+      body,
+      error,
+      jwt_auth,
+    }: {
+      body: UserModelForRegistration;
+      error: (code: Number, message?: string) => void;
+      jwt_auth: any;
+    }) => {
       // 1. Ensure the user does not exist yet.
       const foundUser = await UserDTO.findUserByEmail(body.email);
 
@@ -21,7 +31,7 @@ export const registerRouter = new Elysia().use(jwtConfig).post(
 
       // 4. If there's an error creating the user, handle it.
       if (!newUser) return error(400, "Problems creating user");
-      console.log(newUser);
+
       // 5. Tokenize the results with JWT.
       const token = await jwt_auth.sign({
         id: newUser.id,
@@ -34,11 +44,5 @@ export const registerRouter = new Elysia().use(jwtConfig).post(
 
       // 6. Return the token.
       return { access_token: token };
-    } catch (err) {
-      console.log(err);
     }
-  },
-  {
-    body: userModelForSignup,
-  }
-);
+  );
