@@ -1,13 +1,15 @@
-import Elysia from "elysia";
+import Elysia, { t } from "elysia";
 import { jwtConfig } from "../config/jwtConfig";
-import { authorizationMiddleware } from "../middleware/authorization";
+import {
+  authorizationMiddleware,
+  JwtObject,
+} from "../middleware/authorization";
 import { CalendarDTO } from "../models/calendarModel";
 import {
   CalendarModelForCreation,
-  CalendarModelForUserCreation,
   getRandomColor,
-  jwtObject,
   MembershipModelForCreation,
+  calendarModelForUserCreation,
 } from "@shared/index";
 import { MembershipDTO } from "src/models/membershipModel";
 
@@ -23,45 +25,42 @@ export const calendarRouter = new Elysia()
       },
     },
     (app) =>
-      app.post(
-        "/new-calendar",
-        async ({
-          body,
-          user,
-          error,
-        }: {
-          body: CalendarModelForUserCreation;
-          user: jwtObject;
-          error: any;
-        }) => {
-          // 1) use calendarModel to create a new group calendar for the user
-          const calendarForCreation: CalendarModelForCreation = {
-            name: body.name,
-            description: body.description,
-            owner_user_id: user.id,
-            is_group: body.is_group,
-            color: body.color,
-          };
-          const calendar = await CalendarDTO.createCalendar(
-            calendarForCreation
-          );
+      app
+        .post(
+          "/new-calendar",
+          async ({ body, user, error }) => {
+            // 1) use calendarModel to create a new group calendar for the user
+            const calendarForCreation: CalendarModelForCreation = {
+              name: body.name,
+              description: body.description,
+              owner_user_id: user.id,
+              is_group: body.is_group,
+              color: body.color,
+            };
+            const calendar = await CalendarDTO.createCalendar(
+              calendarForCreation
+            );
 
-          if (!calendar) return error(500, "Failed to create calendar");
+            if (!calendar) return error(500, "Failed to create calendar");
 
-          // 2) use membershipModel to create a new membership
-          const membershipForCreation: MembershipModelForCreation = {
-            calendar_id: calendar.id,
-            user_id: user.id,
-            role: "owner",
-            color: getRandomColor(),
-          };
-          const membership = MembershipDTO.createMembership(
-            membershipForCreation
-          );
+            // 2) use membershipModel to create a new membership
+            const membershipForCreation: MembershipModelForCreation = {
+              calendar_id: calendar.id,
+              user_id: user.id,
+              role: "owner",
+              color: getRandomColor(),
+            };
+            const membership = MembershipDTO.createMembership(
+              membershipForCreation
+            );
 
-          if (!membership) return error(500, "Failed to create membership");
+            if (!membership) return error(500, "Failed to create membership");
 
-          return { calendar_id: calendar.id };
-        }
-      )
+            return { calendar_id: calendar.id };
+          },
+          { body: { calendarModelForUserCreation } }
+        )
+        .delete("/calendar/:id", async ({ params, user, error }) => {}, {
+          params: t.Object({ id: t.Integer() }),
+        })
   );
