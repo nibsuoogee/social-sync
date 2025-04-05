@@ -1,9 +1,9 @@
 export * from "./src/types";
 
-export * from "./src/models/attendanceModel";
-export * from "./src/models/calendarModel";
-export * from "./src/models/eventsCalendarsModel";
-export * from "./src/models/eventsModel";
-export * from "./src/models/membershipModel";
-export * from "./src/models/invitationModel";
-export * from "./src/models/userModel";
+export * from "./src/schemas/attendanceSchema";
+export * from "./src/schemas/calendarSchema";
+export * from "./src/schemas/eventsCalendarsSchema";
+export * from "./src/schemas/eventsSchema";
+export * from "./src/schemas/membershipSchema";
+export * from "./src/schemas/invitationSchema";
+export * from "./src/schemas/userSchema";
