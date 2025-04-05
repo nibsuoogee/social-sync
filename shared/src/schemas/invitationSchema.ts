@@ -40,7 +40,6 @@ export type InvitationBody = typeof invitationBody.static;
 
 export const invitationUpdateBody = t.Object({
   id: t.Integer(), // invite id
-  user_id: t.Integer(),
   status: t.Enum({
     accepted: "accepted",
     declined: "declined",

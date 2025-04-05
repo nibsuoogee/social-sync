@@ -3,6 +3,7 @@ import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
 import { InvitationDTO } from "../models/invitationsModel";
 import { InvitationBody, InvitationUpdateBody, jwtObject } from "@shared/index";
+import { MembershipDTO } from "../models/membershipModel";
 
 export const groupRouter = new Elysia()
   .use(jwtConfig)
@@ -51,7 +52,7 @@ export const groupRouter = new Elysia()
             return "Success";
           }
         )
-        .post(
+        .patch(
           "/update-invitation",
           async ({
             body,
@@ -63,14 +64,27 @@ export const groupRouter = new Elysia()
             error: any;
           }) => {
             const { updateInvitation } = InvitationDTO;
+            const { createMembership } = MembershipDTO;
 
-            const updatedInvitation = updateInvitation({
+            const updatedInvitation = await updateInvitation({
               id: body.id,
               user_id: user.id,
               status: body.status,
             });
 
             if (!updatedInvitation) return error(500, "Internal Server Error");
+
+            // if the invitation is accepted, create a calendar membership for the user
+            if (body.status === "accepted") {
+              const newInvitation = createMembership({
+                calendar_id: updatedInvitation.calendar_id,
+                user_id: user.id,
+                role: "member",
+                color: "#1A1A1A",
+              });
+              if (!newInvitation) return error(500, "Internal Server Error");
+            }
+
             return "Success";
           }
         )
