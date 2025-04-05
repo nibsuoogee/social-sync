@@ -1,4 +1,4 @@
-import { EventsCalendars } from "@shared/index";
+import { t } from "elysia";
 import { sql } from "bun";
 
 /**
@@ -15,3 +15,9 @@ export const EventsCalendarsDTO = {
     return newRelation;
   },
 };
+
+export const eventsCalendarsModel = t.Object({
+  events_id: t.Integer(),
+  calendars_id: t.Integer(),
+});
+export type EventsCalendars = typeof eventsCalendarsModel.static;

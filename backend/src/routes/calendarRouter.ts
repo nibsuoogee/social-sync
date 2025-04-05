@@ -1,17 +1,16 @@
 import Elysia, { t } from "elysia";
 import { jwtConfig } from "../config/jwtConfig";
+import { authorizationMiddleware } from "../middleware/authorization";
 import {
-  authorizationMiddleware,
-  JwtObject,
-} from "../middleware/authorization";
-import { CalendarDTO } from "../models/calendarModel";
-import {
+  CalendarDTO,
   CalendarModelForCreation,
-  getRandomColor,
-  MembershipModelForCreation,
   calendarModelForUserCreation,
-} from "@shared/index";
-import { MembershipDTO } from "src/models/membershipModel";
+} from "../models/calendarModel";
+import {
+  MembershipDTO,
+  MembershipModelForCreation,
+} from "src/models/membershipModel";
+import { getRandomColor, jwtObject } from "@shared/index";
 
 export const calendarRouter = new Elysia()
   .use(jwtConfig)
@@ -53,8 +52,6 @@ export const calendarRouter = new Elysia()
             const membership = MembershipDTO.createMembership(
               membershipForCreation
             );
-
-            if (!membership) return error(500, "Failed to create membership");
 
             return { calendar_id: calendar.id };
           },
