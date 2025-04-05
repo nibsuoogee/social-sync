@@ -1,14 +1,16 @@
 import Elysia from "elysia";
 import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
-import { CalendarDTO } from "../models/calendarModel";
 import {
+  CalendarDTO,
   CalendarModelForCreation,
-  CalendarModelForUserCreation,
-  jwtObject,
+  calendarModelForUserCreation,
+} from "../models/calendarModel";
+import {
+  MembershipDTO,
   MembershipModelForCreation,
-} from "@shared/index";
-import { MembershipDTO } from "src/models/membershipModel";
+} from "src/models/membershipModel";
+import { jwtObject } from "@shared/index";
 
 export const calendarRouter = new Elysia()
   .use(jwtConfig)
@@ -24,15 +26,7 @@ export const calendarRouter = new Elysia()
     (app) =>
       app.post(
         "/new-calendar",
-        async ({
-          body,
-          user,
-          error,
-        }: {
-          body: CalendarModelForUserCreation;
-          user: jwtObject;
-          error: unknown;
-        }) => {
+        async ({ body, user, error }) => {
           // 1) use calendarModel to create a new group calendar for the user
           const calendarForCreation: CalendarModelForCreation = {
             name: body.name,
@@ -57,6 +51,10 @@ export const calendarRouter = new Elysia()
           );
 
           return { calendar_id: calendar.id };
+        },
+        {
+          body: calendarModelForUserCreation,
+          user: jwtObject,
         }
       )
   );

@@ -1,9 +1,13 @@
 import Elysia, { error } from "elysia";
 import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
-import { InvitationDTO } from "../models/invitationsModel";
-import { InvitationBody, InvitationUpdateBody, jwtObject } from "@shared/index";
+import {
+  InvitationBody,
+  InvitationDTO,
+  InvitationUpdateBody,
+} from "../models/invitationsModel";
 import { MembershipDTO } from "../models/membershipModel";
+import { JwtObject } from "@shared/index";
 
 export const groupRouter = new Elysia()
   .use(jwtConfig)
@@ -26,7 +30,7 @@ export const groupRouter = new Elysia()
             error,
           }: {
             body: InvitationBody;
-            user: jwtObject;
+            user: JwtObject;
             error: (code: Number, message?: string) => void;
           }) => {
             // user request includes the user_id which the invitation is sent to and calendar_id
@@ -60,7 +64,7 @@ export const groupRouter = new Elysia()
             error,
           }: {
             body: InvitationUpdateBody;
-            user: jwtObject;
+            user: JwtObject;
             error: any;
           }) => {
             const { updateInvitation } = InvitationDTO;

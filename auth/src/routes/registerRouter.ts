@@ -1,7 +1,6 @@
 import Elysia, { t } from "elysia";
-import { UserDTO } from "../models/userModel";
+import { UserDTO, UserModelForRegistration } from "../models/userModel";
 import { jwtConfig } from "../config/jwtConfig";
-import { UserModelForRegistration } from "@shared/index";
 
 export const registerRouter = new Elysia()
   .use(jwtConfig)
