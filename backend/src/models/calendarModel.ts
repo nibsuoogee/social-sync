@@ -1,6 +1,5 @@
 import { t } from "elysia";
 import { sql } from "bun";
-import { t } from "elysia";
 
 /**
  * Calendar Data Transfer Object
@@ -16,11 +15,21 @@ export const CalendarDTO = {
     return newCalendar;
   },
   deleteCalendar: async (calendar_id: number): Promise<Calendar> => {
-    const [newCalendar] = await sql`
+    const [deletedCalendar] = await sql`
       DELETE FROM calendars 
-      WHERE calendar_id = ${calendar_id}
+      WHERE id = ${calendar_id}
+      RETURNING *;
     `;
-    return newCalendar;
+    return deletedCalendar;
+  },
+  isCalendarOwner: async (
+    calendar_id: number,
+    owner_user_id: number
+  ): Promise<boolean> => {
+    const [result] = await sql`
+      SELECT EXISTS(SELECT 1 FROM calendars 
+      WHERE id = ${calendar_id} AND owner_user_id = ${owner_user_id})`;
+    return result;
   },
 };
 
@@ -44,11 +53,10 @@ export const calendarModel = t.Object({
 });
 export type Calendar = typeof calendarModel.static;
 
-export const calendarModelForUserCreation = t.Object({
+export const calendarCreateBody = t.Object({
   name: t.String(),
   description: t.String(),
   is_group: t.Boolean(),
   color: t.String(),
 });
-export type CalendarModelForUserCreation =
-  typeof calendarModelForUserCreation.static;
+export type CalendarCreateBody = typeof calendarCreateBody.static;

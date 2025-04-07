@@ -37,9 +37,6 @@ export const loginRouter = new Elysia()
           //permissions: foundUser.permissions.toString(),
         });
 
-        console.log("Token created!");
-        console.log(token);
-
         if (!token) return error(400, "Problems creating token");
 
         // 6. Return the token.

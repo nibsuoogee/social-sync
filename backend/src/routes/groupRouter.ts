@@ -7,7 +7,8 @@ import {
   InvitationUpdateBody,
 } from "../models/invitationsModel";
 import { MembershipDTO } from "../models/membershipModel";
-import { JwtObject } from "@shared/index";
+import { JwtObject } from "@shared/src/types";
+import { CalendarDTO } from "src/models/calendarModel";
 
 export const groupRouter = new Elysia()
   .use(jwtConfig)
@@ -34,17 +35,19 @@ export const groupRouter = new Elysia()
             error: (code: Number, message?: string) => void;
           }) => {
             // user request includes the user_id which the invitation is sent to and calendar_id
-            const { createInvitation, checkCalendarOwner, findUserIdbyEmail } =
-              InvitationDTO;
+            const { createInvitation, findUserIdbyEmail } = InvitationDTO;
 
             const invitedUserId = await findUserIdbyEmail(body.email);
             // user can't invite themselves
             if (user.id === invitedUserId) return error(400, "Not allowed");
 
             // check if the current user is the owner of the calendar
-            const calendar_id = await checkCalendarOwner(user.id);
+            const isCalendarOwner = await CalendarDTO.isCalendarOwner(
+              body.calendar_id,
+              user.id
+            );
 
-            if (!calendar_id || calendar_id !== body.calendar_id)
+            if (!isCalendarOwner)
               return error(401, "No authorized access to calendar");
 
             const newInvitation = createInvitation({

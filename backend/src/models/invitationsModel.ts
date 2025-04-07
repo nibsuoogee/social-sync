@@ -14,12 +14,6 @@ export const InvitationDTO = {
     `;
     return newInvitation;
   },
-  checkCalendarOwner: async (id: number): Promise<Number> => {
-    const [calendar_id] = await sql`
-    SELECT id FROM calendars WHERE owner_user_id = ${id}
-    `;
-    return calendar_id.id;
-  },
   updateInvitation: async (
     invitation: InvitationModelForUpdate
   ): Promise<Invitation> => {
