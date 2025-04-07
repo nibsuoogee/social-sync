@@ -14,6 +14,22 @@ export const CalendarDTO = {
     `;
     return newCalendar;
   },
+  getCalendars: async (user_id: number): Promise<Calendar[]> => {
+    const calendars = await sql`SELECT * FROM calendars 
+      WHERE owner_user_id = ${user_id}`;
+    return [...calendars];
+  },
+  updateCalendar: async (
+    calendar_id: number,
+    calendar: CalendarModelForUpdate
+  ): Promise<Calendar> => {
+    const [newCalendar] = await sql`
+      UPDATE calendars SET ${sql(calendar)}
+      WHERE id = ${calendar_id}
+      RETURNING *
+    `;
+    return newCalendar;
+  },
   deleteCalendar: async (calendar_id: number): Promise<Calendar> => {
     const [deletedCalendar] = await sql`
       DELETE FROM calendars 
@@ -60,3 +76,18 @@ export const calendarCreateBody = t.Object({
   color: t.String(),
 });
 export type CalendarCreateBody = typeof calendarCreateBody.static;
+
+export const calendarUpdateBody = t.Object({
+  id: t.Integer(),
+  name: t.String(),
+  description: t.String(),
+  color: t.String(),
+});
+export type CalendarUpdateBody = typeof calendarUpdateBody.static;
+
+export const calendarModelForUpdate = t.Object({
+  name: t.String(),
+  description: t.String(),
+  color: t.String(),
+});
+export type CalendarModelForUpdate = typeof calendarModelForUpdate.static;
