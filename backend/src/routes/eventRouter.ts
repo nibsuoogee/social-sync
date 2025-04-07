@@ -1,9 +1,14 @@
-import Elysia from "elysia";
+import { t, Elysia } from "elysia";
 import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
-import { eventModelBody } from "src/models/eventsModel";
+import {
+  eventModel,
+  eventModelBody,
+  eventsCalendarsModel,
+} from "src/models/eventsModel";
 import { EventDTO } from "src/models/eventsModel";
-import { AttendanceDTO } from "src/models/attendanceModel";
+import { AttendanceDTO, attendanceModel } from "src/models/attendanceModel";
+import { tryCatch } from "@shared/src/tryCatch";
 
 export const eventRouter = new Elysia()
   .use(jwtConfig)
@@ -25,44 +30,48 @@ export const eventRouter = new Elysia()
 
           const { calendar_id, ...eventData } = body;
 
-          const event = await createEvent({
-            ...eventData,
-            proposed_by_user_id: user.id,
-          });
-
+          const [event, errEvent] = await tryCatch(
+            createEvent({
+              ...eventData,
+              proposed_by_user_id: user.id,
+            })
+          );
+          if (errEvent) return error(500, errEvent.message);
           if (!event) return error(500, "Event not created");
 
-          try {
-            const newEntry = await addEventToCalendar({
+          const [eventsCalendar, errEventsCalendar] = await tryCatch(
+            addEventToCalendar({
               events_id: event.id,
               calendars_id: calendar_id,
-            });
-
-            if (!newEntry)
-              return error(500, "Error creating entry in events_calendars");
-          } catch {
-            console.error("Error creating entry in events_calendars:", error);
+            })
+          );
+          if (errEventsCalendar) return error(500, errEventsCalendar.message);
+          if (!eventsCalendar)
             return error(500, "Error creating entry in events_calendars");
-          }
 
-          try {
-            const newAttendance = await recordAttendance({
+          const [newAttendance, errNewAttendance] = await tryCatch(
+            recordAttendance({
               event_id: event.id,
               user_id: user.id,
               status: "accepted",
-            });
-
-            if (!newAttendance)
-              return error(500, "Error creating entry in event_attendance");
-          } catch {
-            console.error("Error creating entry in event_attendance:", error);
+            })
+          );
+          if (errNewAttendance) return error(500, errNewAttendance.message);
+          if (!newAttendance)
             return error(500, "Error creating entry in event_attendance");
-          }
 
-          return { event };
+          return { event, eventsCalendar, newAttendance };
         },
         {
           body: eventModelBody,
+          response: {
+            200: t.Object({
+              event: eventModel,
+              eventsCalendar: eventsCalendarsModel,
+              newAttendance: attendanceModel,
+            }),
+            500: t.String(),
+          },
         }
       )
   );

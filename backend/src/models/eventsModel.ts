@@ -52,8 +52,8 @@ export const eventModel = t.Object({
   title: t.String(),
   description: t.Optional(t.String()),
   location: t.Optional(t.String()),
-  start_time: t.String(),
-  end_time: t.String(),
+  start_time: t.Date(),
+  end_time: t.Date(),
   timezone: t.String(),
   all_day: t.Boolean(),
   recurrence_rule: t.Optional(t.String()),
@@ -62,8 +62,8 @@ export const eventModel = t.Object({
     tentative: "tentative",
     cancelled: "cancelled",
   }),
-  created_at: t.String(), // ISO timestamp
-  updated_at: t.String(), // ISO timestamp
+  created_at: t.Date(), // ISO timestamp
+  updated_at: t.Date(), // ISO timestamp
   proposed_by_user_id: t.Integer(),
 });
 export type Event = typeof eventModel.static;
