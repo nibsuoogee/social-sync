@@ -36,8 +36,6 @@ export const registerRouter = new Elysia()
         id: newUser.id,
         //permissions: newUser.permissions?.join(",") ?? "",
       });
-      console.log("Token created!");
-      console.log(token);
 
       if (!token) return error(400, "Problems creating token");
 
