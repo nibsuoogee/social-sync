@@ -16,22 +16,22 @@ export const AttendanceDTO = {
   },
 };
 
-export const AttendanceModelForCreation = t.Object({
+export const attendanceModelForCreation = t.Object({
   event_id: t.Integer(),
   user_id: t.Integer(),
-  status: t
-    .Enum({
+  status: t.Optional(
+    t.Enum({
       accepted: "accepted",
       declined: "declined",
       tentative: "tentative",
       "needs-action": "needs-action",
     })
-    .Default("needs-action"),
+  ),
 });
 export type AttendanceModelForCreation =
-  typeof AttendanceModelForCreation.static;
+  typeof attendanceModelForCreation.static;
 
-export const AttendanceModel = t.Object({
+export const attendanceModel = t.Object({
   id: t.Integer(),
   event_id: t.Integer(),
   user_id: t.Integer(),
@@ -42,4 +42,4 @@ export const AttendanceModel = t.Object({
     "needs-action": "needs-action",
   }),
 });
-export type Attendance = typeof AttendanceModel.static;
+export type Attendance = typeof attendanceModel.static;

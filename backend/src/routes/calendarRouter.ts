@@ -10,7 +10,6 @@ import {
   MembershipDTO,
   MembershipModelForCreation,
 } from "src/models/membershipModel";
-import { jwtObject } from "@shared/index";
 
 export const calendarRouter = new Elysia()
   .use(jwtConfig)
@@ -54,7 +53,6 @@ export const calendarRouter = new Elysia()
         },
         {
           body: calendarModelForUserCreation,
-          user: jwtObject,
         }
       )
   );

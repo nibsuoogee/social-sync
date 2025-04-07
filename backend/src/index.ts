@@ -4,6 +4,7 @@ import { Elysia } from "elysia";
 import { protectedRouter } from "./routes/protectedRouter";
 import { groupRouter } from "./routes/groupRouter";
 import { calendarRouter } from "src/routes/calendarRouter";
+import { eventRouter } from "./routes/eventRouter";
 
 const app = new Elysia()
   .use(swagger())
@@ -12,6 +13,7 @@ const app = new Elysia()
   .use(protectedRouter)
   .use(groupRouter)
   .use(calendarRouter)
+  .use(eventRouter)
   .listen(3000);
 
 console.log(
