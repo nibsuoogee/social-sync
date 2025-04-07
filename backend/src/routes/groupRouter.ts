@@ -1,8 +1,14 @@
 import Elysia, { error } from "elysia";
 import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
-import { InvitationDTO } from "../models/invitationsModel";
-import { InvitationBody, InvitationUpdateBody, jwtObject } from "@shared/index";
+import {
+  InvitationBody,
+  InvitationDTO,
+  InvitationUpdateBody,
+} from "../models/invitationsModel";
+import { MembershipDTO } from "../models/membershipModel";
+import { JwtObject } from "@shared/src/types";
+import { CalendarDTO } from "src/models/calendarModel";
 
 export const groupRouter = new Elysia()
   .use(jwtConfig)
@@ -25,21 +31,23 @@ export const groupRouter = new Elysia()
             error,
           }: {
             body: InvitationBody;
-            user: jwtObject;
+            user: JwtObject;
             error: (code: Number, message?: string) => void;
           }) => {
             // user request includes the user_id which the invitation is sent to and calendar_id
-            const { createInvitation, checkCalendarOwner, findUserIdbyEmail } =
-              InvitationDTO;
+            const { createInvitation, findUserIdbyEmail } = InvitationDTO;
 
             const invitedUserId = await findUserIdbyEmail(body.email);
             // user can't invite themselves
             if (user.id === invitedUserId) return error(400, "Not allowed");
 
             // check if the current user is the owner of the calendar
-            const calendar_id = await checkCalendarOwner(user.id);
+            const isCalendarOwner = await CalendarDTO.isCalendarOwner(
+              body.calendar_id,
+              user.id
+            );
 
-            if (!calendar_id || calendar_id !== body.calendar_id)
+            if (!isCalendarOwner)
               return error(401, "No authorized access to calendar");
 
             const newInvitation = createInvitation({
@@ -51,7 +59,7 @@ export const groupRouter = new Elysia()
             return "Success";
           }
         )
-        .post(
+        .patch(
           "/update-invitation",
           async ({
             body,
@@ -59,18 +67,31 @@ export const groupRouter = new Elysia()
             error,
           }: {
             body: InvitationUpdateBody;
-            user: jwtObject;
+            user: JwtObject;
             error: any;
           }) => {
             const { updateInvitation } = InvitationDTO;
+            const { createMembership } = MembershipDTO;
 
-            const updatedInvitation = updateInvitation({
+            const updatedInvitation = await updateInvitation({
               id: body.id,
               user_id: user.id,
               status: body.status,
             });
 
             if (!updatedInvitation) return error(500, "Internal Server Error");
+
+            // if the invitation is accepted, create a calendar membership for the user
+            if (body.status === "accepted") {
+              const newInvitation = createMembership({
+                calendar_id: updatedInvitation.calendar_id,
+                user_id: user.id,
+                role: "member",
+                color: "#1A1A1A",
+              });
+              if (!newInvitation) return error(500, "Internal Server Error");
+            }
+
             return "Success";
           }
         )

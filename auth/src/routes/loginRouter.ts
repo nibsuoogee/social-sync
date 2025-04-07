@@ -1,7 +1,6 @@
 import Elysia, { t } from "elysia";
 import { jwtConfig } from "../config/jwtConfig";
-import { UserDTO } from "../models/userModel";
-import { UserModelForLogin } from "@shared/index";
+import { UserDTO, UserModelForLogin } from "../models/userModel";
 
 export const loginRouter = new Elysia()
   .use(jwtConfig)
@@ -37,9 +36,6 @@ export const loginRouter = new Elysia()
           id: foundUser.id,
           //permissions: foundUser.permissions.toString(),
         });
-
-        console.log("Token created!");
-        console.log(token);
 
         if (!token) return error(400, "Problems creating token");
 
