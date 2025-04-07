@@ -4,8 +4,10 @@ import { authorizationMiddleware } from "../middleware/authorization";
 import {
   CalendarDTO,
   CalendarModelForCreation,
+  CalendarModelForUpdate,
   calendarCreateBody,
   calendarModel,
+  calendarUpdateBody,
 } from "../models/calendarModel";
 import {
   MembershipDTO,
@@ -29,9 +31,9 @@ export const calendarRouter = new Elysia()
     (app) =>
       app
         .post(
-          "/new-calendar",
+          "/calendar",
           async ({ body, user, error }) => {
-            // 1) use calendarModel to create a new group calendar for the user
+            // 1) create a new calendar for the user
             const calendarForCreation: CalendarModelForCreation = {
               name: body.name,
               description: body.description,
@@ -67,6 +69,62 @@ export const calendarRouter = new Elysia()
                 calendar: calendarModel,
                 membership: membershipModel,
               }),
+              500: t.String(),
+            },
+          }
+        )
+        .get(
+          "/calendars",
+          async ({ user, error }) => {
+            // 1) get the user's calendars
+            const [calendars, err] = await tryCatch(
+              CalendarDTO.getCalendars(user.id)
+            );
+            if (err) return error(500, err.message);
+            if (!calendars) return error(500, "Failed to get calendars");
+
+            console.log("calendars:");
+            console.log(calendars);
+
+            return calendars;
+          },
+          {
+            response: {
+              200: t.Array(calendarModel),
+              500: t.String(),
+            },
+          }
+        )
+        .patch(
+          "/calendar",
+          async ({ body, user, error }) => {
+            // 1) check if the user owns the calendar
+            const [isCalendarOwner, errOwner] = await tryCatch(
+              CalendarDTO.isCalendarOwner(body.id, user.id)
+            );
+            if (errOwner) return error(500, errOwner.message);
+            if (!isCalendarOwner)
+              return error(401, "No authorized access to calendar");
+
+            // 2) Update the calendar
+            const calendarForUpdate: CalendarModelForUpdate = {
+              name: body.name,
+              description: body.description,
+              color: body.color,
+            };
+            const [calendar, errCalendar] = await tryCatch(
+              CalendarDTO.updateCalendar(body.id, calendarForUpdate)
+            );
+            if (errCalendar) return error(500, errCalendar.message);
+            if (!calendar) return error(500, "Failed to update calendar");
+
+            return calendar;
+          },
+          {
+            body: calendarUpdateBody,
+            response: {
+              200: calendarModel,
+              401: t.String(),
               500: t.String(),
             },
           }
