@@ -41,7 +41,7 @@ Table calendars {
   id integer [pk, increment, not null]
   name varchar(255) [not null]
   description varchar(1000) [not null]
-  owner_user_id integer [default: null] // NULL if it's a group calendar
+  owner_user_id integer // NULL if it's a group calendar
   is_group boolean [default: false, not null]
   created_at timestamp [default: `now()`, not null]
   color varchar(7) [not null] // The colour of the calendar
@@ -79,7 +79,16 @@ Table events {
 }
 Ref: events.proposed_by_user_id > users.id [delete: cascade]
 
-Ref events_calendars: events.id <> calendars.id // many-to-many
+Table "events_calendars" {
+  "events_id" integer
+  "calendars_id" integer
+
+  Indexes {
+    (events_id, calendars_id) [pk]
+  }
+}
+Ref: events_calendars.events_id > events.id [delete: cascade]
+Ref: events_calendars.calendars_id > calendars.id [delete: cascade]
 
 Table event_attendance {
   id integer [pk, increment, not null]

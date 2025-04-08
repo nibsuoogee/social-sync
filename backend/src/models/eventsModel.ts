@@ -13,6 +13,15 @@ export const EventDTO = {
 
     return newEvent;
   },
+  getEvents: async (calendar_id: number): Promise<Event[]> => {
+    const events = await sql`
+      SELECT events.*
+      FROM events
+      JOIN events_calendars ON events.id = events_calendars.events_id
+      WHERE events_calendars.calendars_id = ${calendar_id}
+    `;
+    return [...events];
+  },
   addEventToCalendar: async (
     eventsCalendars: EventsCalendarsModel
   ): Promise<EventsCalendarsModel> => {
@@ -23,18 +32,46 @@ export const EventDTO = {
 
     return newEntry;
   },
+  updateEvent: async (
+    event_id: number,
+    event: EventModelForUpdate
+  ): Promise<Event> => {
+    const [newEvent] = await sql`
+      UPDATE events SET ${sql(event)}
+      WHERE id = ${event_id}
+      RETURNING *
+    `;
+    return newEvent;
+  },
+  deleteEvent: async (event_id: number): Promise<Event> => {
+    const [deletedEvent] = await sql`
+      DELETE FROM events 
+      WHERE id = ${event_id}
+      RETURNING *;`;
+    return deletedEvent;
+  },
+  isEventOwner: async (
+    event_id: number,
+    proposed_by_user_id: number
+  ): Promise<boolean> => {
+    const [result] = await sql`
+      SELECT EXISTS(SELECT 1 FROM events 
+      WHERE id = ${event_id} 
+      AND proposed_by_user_id = ${proposed_by_user_id})`;
+    return result;
+  },
 };
 
 export const eventModelForCreation = t.Object({
   ics_uid: t.String(),
   title: t.String(),
-  description: t.Optional(t.String()),
-  location: t.Optional(t.String()),
-  start_time: t.String(), // ISO timestamp string
-  end_time: t.String(), // ISO timestamp string
+  description: t.String(),
+  location: t.String(),
+  start_time: t.Date(),
+  end_time: t.Date(),
   timezone: t.Optional(t.String()),
   all_day: t.Optional(t.Boolean()),
-  recurrence_rule: t.Optional(t.String()),
+  recurrence_rule: t.String(),
   status: t.Optional(
     t.Enum({
       confirmed: "confirmed",
@@ -50,13 +87,13 @@ export const eventModel = t.Object({
   id: t.Integer(),
   ics_uid: t.String(),
   title: t.String(),
-  description: t.Optional(t.String()),
-  location: t.Optional(t.String()),
+  description: t.String(),
+  location: t.String(),
   start_time: t.Date(),
   end_time: t.Date(),
   timezone: t.String(),
   all_day: t.Boolean(),
-  recurrence_rule: t.Optional(t.String()),
+  recurrence_rule: t.String(),
   status: t.Enum({
     confirmed: "confirmed",
     tentative: "tentative",
@@ -72,10 +109,10 @@ export const eventModelBody = t.Object({
   calendar_id: t.Integer(),
   ics_uid: t.String(),
   title: t.String(),
-  description: t.Optional(t.String()),
-  location: t.Optional(t.String()),
-  start_time: t.String(), // ISO timestamp string
-  end_time: t.String(), // ISO timestamp string
+  description: t.String(),
+  location: t.String(),
+  start_time: t.Date(),
+  end_time: t.Date(),
   timezone: t.Optional(t.String()),
   all_day: t.Optional(t.Boolean()),
   recurrence_rule: t.String(),
@@ -87,3 +124,26 @@ export const eventsCalendarsModel = t.Object({
   events_id: t.Integer(),
 });
 export type EventsCalendarsModel = typeof eventsCalendarsModel.static;
+
+export const eventUpdateBody = t.Object({
+  id: t.Integer(),
+  title: t.Optional(t.String()),
+  description: t.Optional(t.String()),
+  location: t.Optional(t.String()),
+  start_time: t.Optional(t.Date()),
+  end_time: t.Optional(t.Date()),
+  timezone: t.Optional(t.String()),
+  all_day: t.Optional(t.Boolean()),
+  recurrence_rule: t.Optional(t.String()),
+  status: t.Optional(
+    t.Enum({
+      confirmed: "confirmed",
+      tentative: "tentative",
+      cancelled: "cancelled",
+    })
+  ),
+});
+export type EventUpdateBody = typeof eventUpdateBody.static;
+
+export const eventModelForUpdate = t.Omit(eventUpdateBody, ["id"]);
+export type EventModelForUpdate = typeof eventModelForUpdate.static;
