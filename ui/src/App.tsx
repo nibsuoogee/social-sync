@@ -3,12 +3,14 @@ import axios from "axios";
 import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import { LoginForm } from "./components/LoginForm";
-import { RegisterForm } from "./components/RegisterForm";
-import { Frontpage } from "./components/Frontpage";
+import { Login } from "./pages/Login";
+import { Register } from "./pages/Register";
+import { Frontpage } from "./pages/Frontpage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { Dashboard } from "./components/Dashboard";
+import { MainMenu } from "./pages/MainMenu";
 import { AuthProvider } from "./contexts/AuthContext";
+import { PageShell } from "./components/PageShell";
+import { Calendar } from "./pages/Calendar";
 
 function App() {
   useEffect(() => {
@@ -41,19 +43,29 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Frontpage />} />
-          <Route path="/register" element={<RegisterForm />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          ></Route>
-        </Routes>
+        <PageShell>
+          <Routes>
+            <Route path="/" element={<Frontpage />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/main-menu"
+              element={
+                <ProtectedRoute>
+                  <MainMenu />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/calendar"
+              element={
+                <ProtectedRoute>
+                  <Calendar />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </PageShell>
       </AuthProvider>
     </Router>
   );
