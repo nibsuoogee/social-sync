@@ -35,11 +35,8 @@ export const calendarRouter = new Elysia()
           async ({ body, user, error }) => {
             // 1) create a new calendar for the user
             const calendarForCreation: CalendarModelForCreation = {
-              name: body.name,
-              description: body.description,
               owner_user_id: user.id,
-              is_group: body.is_group,
-              color: body.color,
+              ...body,
             };
             const [calendar, errCalendar] = await tryCatch(
               CalendarDTO.createCalendar(calendarForCreation)
@@ -83,9 +80,6 @@ export const calendarRouter = new Elysia()
             if (err) return error(500, err.message);
             if (!calendars) return error(500, "Failed to get calendars");
 
-            console.log("calendars:");
-            console.log(calendars);
-
             return calendars;
           },
           {
@@ -107,13 +101,10 @@ export const calendarRouter = new Elysia()
               return error(401, "No authorized access to calendar");
 
             // 2) Update the calendar
-            const calendarForUpdate: CalendarModelForUpdate = {
-              name: body.name,
-              description: body.description,
-              color: body.color,
-            };
+            const { id, ...calendarForUpdate } = body;
+
             const [calendar, errCalendar] = await tryCatch(
-              CalendarDTO.updateCalendar(body.id, calendarForUpdate)
+              CalendarDTO.updateCalendar(id, calendarForUpdate)
             );
             if (errCalendar) return error(500, errCalendar.message);
             if (!calendar) return error(500, "Failed to update calendar");

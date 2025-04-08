@@ -14,6 +14,16 @@ export const MembershipDTO = {
     `;
     return newMembership;
   },
+  hasMembership: async (
+    calendar_id: number,
+    user_id: number
+  ): Promise<boolean> => {
+    const [result] = await sql`
+      SELECT EXISTS(SELECT 1 FROM calendar_membership 
+      WHERE calendar_id = ${calendar_id} 
+      AND user_id = ${user_id})`;
+    return result;
+  },
 };
 
 export const membershipModelForCreation = t.Object({

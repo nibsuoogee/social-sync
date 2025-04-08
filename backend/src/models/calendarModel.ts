@@ -49,15 +49,6 @@ export const CalendarDTO = {
   },
 };
 
-export const calendarModelForCreation = t.Object({
-  name: t.String(),
-  description: t.String(),
-  owner_user_id: t.Integer(), // get this from the jwt token
-  is_group: t.Boolean(),
-  color: t.String(),
-});
-export type CalendarModelForCreation = typeof calendarModelForCreation.static;
-
 export const calendarModel = t.Object({
   id: t.Integer(),
   name: t.String(),
@@ -69,25 +60,24 @@ export const calendarModel = t.Object({
 });
 export type Calendar = typeof calendarModel.static;
 
-export const calendarCreateBody = t.Object({
-  name: t.String(),
-  description: t.String(),
-  is_group: t.Boolean(),
-  color: t.String(),
-});
+export const calendarModelForCreation = t.Omit(calendarModel, [
+  "id",
+  "created_at",
+]);
+export type CalendarModelForCreation = typeof calendarModelForCreation.static;
+
+export const calendarCreateBody = t.Omit(calendarModelForCreation, [
+  "owner_user_id",
+]);
 export type CalendarCreateBody = typeof calendarCreateBody.static;
 
 export const calendarUpdateBody = t.Object({
   id: t.Integer(),
-  name: t.String(),
-  description: t.String(),
-  color: t.String(),
+  name: t.Optional(t.String()),
+  description: t.Optional(t.String()),
+  color: t.Optional(t.String()),
 });
 export type CalendarUpdateBody = typeof calendarUpdateBody.static;
 
-export const calendarModelForUpdate = t.Object({
-  name: t.String(),
-  description: t.String(),
-  color: t.String(),
-});
+export const calendarModelForUpdate = t.Omit(calendarUpdateBody, ["id"]);
 export type CalendarModelForUpdate = typeof calendarModelForUpdate.static;
