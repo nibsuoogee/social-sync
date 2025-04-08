@@ -5,6 +5,7 @@ import { protectedRouter } from "./routes/protectedRouter";
 import { inviteRouter } from "./routes/inviteRouter";
 import { calendarRouter } from "src/routes/calendarRouter";
 import { eventRouter } from "./routes/eventRouter";
+import { calendarUrlImportRouter } from "./routes/importCalendarRouter";
 
 const app = new Elysia()
   .use(swagger())
@@ -14,6 +15,7 @@ const app = new Elysia()
   .use(inviteRouter)
   .use(calendarRouter)
   .use(eventRouter)
+  .use(calendarUrlImportRouter)
   .listen(3000);
 
 console.log(

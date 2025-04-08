@@ -10,7 +10,8 @@
     "@elysiajs/cors": "^1.2.0",
     "@elysiajs/jwt": "^1.2.0",
     "@elysiajs/swagger": "^1.2.2",
-    "elysia": "latest"
+    "elysia": "latest",
+    "node-ical": "^0.20.1"
   },
   "devDependencies": {
     "bun-types": "latest"
