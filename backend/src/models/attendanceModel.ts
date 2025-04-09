@@ -18,7 +18,7 @@ export const AttendanceDTO = {
 
 export const attendanceModelForCreation = t.Object({
   event_id: t.Integer(),
-  user_id: t.Integer(),
+  membership_id: t.Integer(),
   status: t.Optional(
     t.Enum({
       accepted: "accepted",
@@ -34,7 +34,7 @@ export type AttendanceModelForCreation =
 export const attendanceModel = t.Object({
   id: t.Integer(),
   event_id: t.Integer(),
-  user_id: t.Integer(),
+  membership_id: t.Integer(),
   status: t.Enum({
     accepted: "accepted",
     declined: "declined",
