@@ -2,7 +2,7 @@ import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
 import { Elysia } from "elysia";
 import { protectedRouter } from "./routes/protectedRouter";
-import { groupRouter } from "./routes/groupRouter";
+import { inviteRouter } from "./routes/inviteRouter";
 import { calendarRouter } from "src/routes/calendarRouter";
 import { eventRouter } from "./routes/eventRouter";
 
@@ -11,7 +11,7 @@ const app = new Elysia()
   .use(cors())
   .get("/", () => "Hello Elysia")
   .use(protectedRouter)
-  .use(groupRouter)
+  .use(inviteRouter)
   .use(calendarRouter)
   .use(eventRouter)
   .listen(3000);
