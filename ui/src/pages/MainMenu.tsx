@@ -1,11 +1,9 @@
-import { Button } from "@mui/joy";
+import { CalendarList } from "@/components/CalendarList";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
 
 export const MainMenu = () => {
   const [username, setUsername] = useState("");
-  const { logout } = useAuth();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -23,7 +21,7 @@ export const MainMenu = () => {
   return (
     <div>
       <h1>Welcome to your dashboard, {username}!</h1>
-      <Button onClick={logout}>Logout</Button>
+      <CalendarList></CalendarList>
     </div>
   );
 };
