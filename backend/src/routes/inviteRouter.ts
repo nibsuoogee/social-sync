@@ -9,6 +9,7 @@ import {
   InvitationModelForUpdate,
   invitationUpdateBody,
   InvitationUpdateBody,
+  newInvitationsResponse,
 } from "../models/invitationsModel";
 import {
   MembershipDTO,
@@ -91,7 +92,7 @@ export const inviteRouter = new Elysia()
           },
           {
             response: {
-              200: t.Array(invitationModel),
+              200: t.Array(newInvitationsResponse),
               500: t.String(),
             },
           }

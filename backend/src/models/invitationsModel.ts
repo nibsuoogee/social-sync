@@ -14,11 +14,45 @@ export const InvitationDTO = {
     `;
     return newInvitation;
   },
-  getNewInvitations: async (user_id: number): Promise<Invitation[]> => {
-    const invitation = await sql`SELECT * FROM invitations 
+  getNewInvitations: async (
+    user_id: number
+  ): Promise<NewInvitationsResponse[]> => {
+    const invitations = await sql`SELECT * FROM invitations 
       WHERE user_id = ${user_id}
       AND status = 'needs-action'`;
-    return [...invitation];
+
+    const result: NewInvitationsResponse[] = [];
+
+    // forming the response body
+    for (const invitation of invitations) {
+      // selecting the required fields from calendar
+      const calendar = await sql`
+      SELECT name, description
+      FROM calendars
+      WHERE id = ${invitation.calendar_id}`;
+
+      // getting the current members of the calendar
+      const members = await sql`
+      SELECT users.username, users.email
+      FROM memberships
+      JOIN users ON memberships.user_id = users.id
+      WHERE memberships.calendar_id = ${invitation.calendar_id}
+      `;
+
+      // pushing the required fields to the result array
+      result.push({
+        id: invitation.id,
+        calendar_id: invitation.calendar_id,
+        name: calendar[0].name,
+        description: calendar[0].description,
+        members: members.map((m: any) => ({
+          username: m.username,
+          email: m.email,
+        })),
+      });
+    }
+
+    return result;
   },
   updateInvitation: async (
     invitation: InvitationModelForUpdate
@@ -70,6 +104,20 @@ export const invitationModel = t.Object({
   created_at: t.Date(),
 });
 export type Invitation = typeof invitationModel.static;
+
+export const newInvitationsResponse = t.Object({
+  id: t.Integer(), // invitation id
+  calendar_id: t.Integer(), // calendar where the user is invited to
+  name: t.String(), // calendar name
+  description: t.String(), // calendar name
+  members: t.Array(
+    t.Object({
+      username: t.String(),
+      email: t.String(),
+    })
+  ), // members of the calendar
+});
+export type NewInvitationsResponse = typeof newInvitationsResponse.static;
 
 export const invitationBody = t.Object({
   email: t.String(), // invited users email
