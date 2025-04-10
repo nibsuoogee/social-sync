@@ -14,6 +14,7 @@
     "@emotion/styled": "^11.14.0",
     "@heroicons/react": "^2.2.0",
     "@mui/joy": "^5.0.0-beta.52",
+    "@radix-ui/react-slot": "^1.2.0",
     "axios": "^1.8.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
