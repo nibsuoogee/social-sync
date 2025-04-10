@@ -60,13 +60,31 @@ export const calendarModel = t.Object({
   is_group: t.Boolean(),
   created_at: t.Date(),
   color: t.String(),
+  external_source_name: t.Optional(t.Union([t.String(), t.Null()])),
+  external_source_url: t.Optional(t.Union([t.String(), t.Null()])),
+  external_last_sync: t.Optional(t.Union([t.Date(), t.Null()])),
+  external_sync_status: t.Optional(
+    t.Union([
+      t.Enum({
+        inactive: "inactive",
+        active: "active",
+        failed: "failed",
+      }),
+      t.Null(),
+    ])
+  ),
 });
 export type Calendar = typeof calendarModel.static;
 
-export const calendarModelForCreation = t.Omit(calendarModel, [
-  "id",
-  "created_at",
-]);
+export const calendarModelForCreation = t.Object({
+  name: t.String(),
+  description: t.String(),
+  owner_user_id: t.Integer(),
+  is_group: t.Boolean(),
+  color: t.String(),
+  external_source_name: t.Optional(t.Union([t.String(), t.Null()])),
+  external_source_url: t.Optional(t.Union([t.String(), t.Null()])),
+});
 export type CalendarModelForCreation = typeof calendarModelForCreation.static;
 
 export const calendarCreateBody = t.Omit(calendarModelForCreation, [
@@ -79,6 +97,8 @@ export const calendarUpdateBody = t.Object({
   name: t.Optional(t.String()),
   description: t.Optional(t.String()),
   color: t.Optional(t.String()),
+  external_source_name: t.Optional(t.Union([t.String(), t.Null()])),
+  external_source_url: t.Optional(t.Union([t.String(), t.Null()])),
 });
 export type CalendarUpdateBody = typeof calendarUpdateBody.static;
 

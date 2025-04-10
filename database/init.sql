@@ -48,7 +48,7 @@ CREATE TABLE "calendars" (
   "external_source_name" varchar(255),
   "external_source_url" varchar(1000),
   "external_last_sync" timestamp,
-  "external_sync_status" sync_status DEFAULT 'inactive'
+  "external_sync_status" sync_status NOT NULL DEFAULT 'inactive'
 );
 
 CREATE TABLE "memberships" (

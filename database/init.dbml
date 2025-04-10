@@ -54,7 +54,7 @@ Table calendars {
   external_source_name varchar(255) // e.g., "Google Calendar"
   external_source_url varchar(1000) // iCalendar SOURCE URL
   external_last_sync timestamp // Last sync time
-  external_sync_status "sync_status" [default: 'inactive'] // Sync state
+  external_sync_status "sync_status" [default: 'inactive', not null] // Sync state
 }
 Ref: calendars.owner_user_id > users.id [delete: cascade]
 
