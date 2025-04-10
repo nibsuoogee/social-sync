@@ -14,6 +14,12 @@ export const InvitationDTO = {
     `;
     return newInvitation;
   },
+  getNewInvitations: async (user_id: number): Promise<Invitation[]> => {
+    const invitation = await sql`SELECT * FROM invitations 
+      WHERE user_id = ${user_id}
+      AND status = 'needs-action'`;
+    return [...invitation];
+  },
   updateInvitation: async (
     invitation: InvitationModelForUpdate
   ): Promise<Invitation> => {

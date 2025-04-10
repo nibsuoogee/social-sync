@@ -9,7 +9,11 @@ import {
   eventUpdateBody,
 } from "src/models/eventsModel";
 import { EventDTO } from "src/models/eventsModel";
-import { AttendanceDTO, attendanceModel } from "src/models/attendanceModel";
+import {
+  AttendanceDTO,
+  attendanceModel,
+  AttendanceModelForCreation,
+} from "src/models/attendanceModel";
 import { tryCatch } from "@shared/src/tryCatch";
 import { MembershipDTO } from "src/models/membershipModel";
 import { EventsCalendarsDTO } from "src/models/eventsCalendarsModel";
@@ -30,22 +34,22 @@ export const eventRouter = new Elysia()
         .post(
           "/event",
           async ({ body, user, error }) => {
-            const { createEvent, addEventToCalendar } = EventDTO;
-            const { recordAttendance } = AttendanceDTO;
-
+            // 1) Create the event
             const { calendar_id, ...eventData } = body;
 
             const [event, errEvent] = await tryCatch(
-              createEvent({
+              EventDTO.createEvent({
                 ...eventData,
                 proposed_by_user_id: user.id,
+                user_read_only: false,
               })
             );
             if (errEvent) return error(500, errEvent.message);
             if (!event) return error(500, "Event not created");
 
+            // 2) Add the event to the calendar
             const [eventsCalendar, errEventsCalendar] = await tryCatch(
-              addEventToCalendar({
+              EventDTO.addEventToCalendar({
                 events_id: event.id,
                 calendars_id: calendar_id,
               })
@@ -54,12 +58,21 @@ export const eventRouter = new Elysia()
             if (!eventsCalendar)
               return error(500, "Error creating entry in events_calendars");
 
+            // 3) Get the user's membership id
+            const [membershipId, errMembership] = await tryCatch(
+              MembershipDTO.getIdByUserAndCalendar(calendar_id, user.id)
+            );
+            if (errMembership) return error(500, errMembership.message);
+            if (!membershipId) return error(500, "Error getting membership id");
+
+            // 4) Add the attendance row
+            const attendance: AttendanceModelForCreation = {
+              event_id: event.id,
+              membership_id: membershipId,
+              status: "accepted",
+            };
             const [newAttendance, errNewAttendance] = await tryCatch(
-              recordAttendance({
-                event_id: event.id,
-                user_id: user.id,
-                status: "accepted",
-              })
+              AttendanceDTO.recordAttendance(attendance)
             );
             if (errNewAttendance) return error(500, errNewAttendance.message);
             if (!newAttendance)
@@ -111,9 +124,9 @@ export const eventRouter = new Elysia()
         .patch(
           "/event",
           async ({ body, user, error }) => {
-            // 1) check if the user owns the event
+            // 1) check if the user can modify the event
             const [isEventOwner, errOwner] = await tryCatch(
-              EventDTO.isEventOwner(body.id, user.id)
+              EventDTO.canModify(body.id, user.id)
             );
             if (errOwner) return error(500, errOwner.message);
             if (!isEventOwner)
@@ -144,7 +157,7 @@ export const eventRouter = new Elysia()
           async ({ params, user, error }) => {
             // 1) check if the user owns the event
             const [isEventOwner, errOwner] = await tryCatch(
-              EventDTO.isEventOwner(params.id, user.id)
+              EventDTO.canModify(params.id, user.id)
             );
             if (errOwner) return error(500, errOwner.message);
             if (!isEventOwner)

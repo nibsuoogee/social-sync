@@ -9,7 +9,7 @@ export const MembershipDTO = {
     membership: MembershipModelForCreation
   ): Promise<Membership> => {
     const [newMembership] = await sql`
-      INSERT INTO calendar_membership ${sql(membership)}
+      INSERT INTO memberships ${sql(membership)}
       RETURNING *
     `;
     return newMembership;
@@ -19,10 +19,20 @@ export const MembershipDTO = {
     user_id: number
   ): Promise<boolean> => {
     const [result] = await sql`
-      SELECT EXISTS(SELECT 1 FROM calendar_membership 
+      SELECT EXISTS(SELECT 1 FROM memberships 
       WHERE calendar_id = ${calendar_id} 
       AND user_id = ${user_id})`;
     return result;
+  },
+  getIdByUserAndCalendar: async (
+    calendar_id: number,
+    user_id: number
+  ): Promise<number> => {
+    const [result] = await sql`
+      SELECT id FROM memberships 
+      WHERE calendar_id = ${calendar_id} 
+      AND user_id = ${user_id}`;
+    return result.id;
   },
 };
 

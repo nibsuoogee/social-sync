@@ -50,14 +50,15 @@ export const EventDTO = {
       RETURNING *;`;
     return deletedEvent;
   },
-  isEventOwner: async (
+  canModify: async (
     event_id: number,
     proposed_by_user_id: number
   ): Promise<boolean> => {
     const [result] = await sql`
       SELECT EXISTS(SELECT 1 FROM events 
       WHERE id = ${event_id} 
-      AND proposed_by_user_id = ${proposed_by_user_id})`;
+      AND proposed_by_user_id = ${proposed_by_user_id}
+      AND user_read_only = false)`;
     return result;
   },
 };
@@ -80,6 +81,7 @@ export const eventModelForCreation = t.Object({
     })
   ),
   proposed_by_user_id: t.Integer(),
+  user_read_only: t.Boolean(),
 });
 export type EventModelForCreation = typeof eventModelForCreation.static;
 
@@ -102,6 +104,7 @@ export const eventModel = t.Object({
   created_at: t.Date(), // ISO timestamp
   updated_at: t.Date(), // ISO timestamp
   proposed_by_user_id: t.Integer(),
+  user_read_only: t.Boolean(),
 });
 export type Event = typeof eventModel.static;
 

@@ -5,7 +5,7 @@
 
 // Docs: https://dbml.dbdiagram.io/docs
 
-Enum "calendar_membership_role" {
+Enum "membership_role" {
   "owner"
   "member"
 }
@@ -29,6 +29,12 @@ Enum "invitation_status" {
   "needs-action"
 }
 
+Enum "sync_status" {
+  "inactive"
+  "active"
+  "failed"
+}
+
 Table users {
   id integer [pk, increment, not null]
   username varchar(50) [not null]
@@ -45,21 +51,22 @@ Table calendars {
   is_group boolean [default: false, not null]
   created_at timestamp [default: `now()`, not null]
   color varchar(7) [not null] // The colour of the calendar
-  //ALTER TABLE colors
-  //ADD CONSTRAINT color_hex_constraint
-  //CHECK (color is null or color ~* '^#[a-f0-9]{6}$');
+  external_source_name varchar(255) // e.g., "Google Calendar"
+  external_source_url varchar(1000) // iCalendar SOURCE URL
+  external_last_sync timestamp // Last sync time
+  external_sync_status "sync_status" [default: 'inactive', not null] // Sync state
 }
 Ref: calendars.owner_user_id > users.id [delete: cascade]
 
-Table calendar_membership {
+Table memberships {
   id integer [pk, increment, not null]
   calendar_id int [not null]
   user_id int [not null]
-  role "calendar_membership_role" [not null]
+  role "membership_role" [not null]
   color varchar(7) [not null] // The colour everyone will see a user's events as in a group
 }
-Ref: calendar_membership.calendar_id > calendars.id [delete: cascade]
-Ref: calendar_membership.user_id > users.id [delete: cascade]
+Ref: memberships.calendar_id > calendars.id [delete: cascade]
+Ref: memberships.user_id > users.id [delete: cascade]
 
 Table events {
   id integer [pk, increment, not null]
@@ -76,6 +83,7 @@ Table events {
   created_at timestamp [default: `now()`, not null] // iCalendar CREATED
   updated_at timestamp [default: `now()`, not null] // iCalendar LAST-MODIFIED
   proposed_by_user_id int [not null] // User who created/imported the event
+  user_read_only boolean [default: false, not null] // imported events are read-only
 }
 Ref: events.proposed_by_user_id > users.id [delete: cascade]
 
@@ -93,11 +101,11 @@ Ref: events_calendars.calendars_id > calendars.id [delete: cascade]
 Table event_attendance {
   id integer [pk, increment, not null]
   event_id int [not null]
-  user_id int [not null]
+  membership_id int [not null]
   status "attendance_status" [default: 'needs-action', not null] // iCalendar PARTSTAT
 }
 Ref: event_attendance.event_id > events.id [delete: cascade]
-Ref: event_attendance.user_id > users.id [delete: cascade]
+Ref: event_attendance.membership_id > memberships.id [delete: cascade]
 
 Table invitations {
   id integer [pk, increment, not null]
@@ -108,14 +116,3 @@ Table invitations {
 }
 Ref: invitations.calendar_id > calendars.id [delete: cascade]
 Ref: invitations.user_id > users.id [delete: cascade]
-
-
-// Table external_calendars {
-//   id integer [pk, increment, not null]
-//   user_id int [not null]
-//   source_name varchar [not null] // e.g., "Google Calendar"
-//   source_url varchar [not null] // iCalendar SOURCE URL
-//   last_sync timestamp [default: `now()`, not null] // Last sync time
-//   sync_status enum('active', 'failed') [default: 'active', not null] // Sync state
-// }
-// Ref: external_calendars.user_id > users.id [delete: cascade]
