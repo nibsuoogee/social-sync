@@ -41,6 +41,7 @@ export const eventRouter = new Elysia()
               EventDTO.createEvent({
                 ...eventData,
                 proposed_by_user_id: user.id,
+                user_read_only: false,
               })
             );
             if (errEvent) return error(500, errEvent.message);
@@ -123,9 +124,9 @@ export const eventRouter = new Elysia()
         .patch(
           "/event",
           async ({ body, user, error }) => {
-            // 1) check if the user owns the event
+            // 1) check if the user can modify the event
             const [isEventOwner, errOwner] = await tryCatch(
-              EventDTO.isEventOwner(body.id, user.id)
+              EventDTO.canModify(body.id, user.id)
             );
             if (errOwner) return error(500, errOwner.message);
             if (!isEventOwner)
@@ -156,7 +157,7 @@ export const eventRouter = new Elysia()
           async ({ params, user, error }) => {
             // 1) check if the user owns the event
             const [isEventOwner, errOwner] = await tryCatch(
-              EventDTO.isEventOwner(params.id, user.id)
+              EventDTO.canModify(params.id, user.id)
             );
             if (errOwner) return error(500, errOwner.message);
             if (!isEventOwner)

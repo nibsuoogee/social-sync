@@ -73,7 +73,8 @@ CREATE TABLE "events" (
   "status" event_status NOT NULL DEFAULT 'confirmed',
   "created_at" timestamp NOT NULL DEFAULT (now()),
   "updated_at" timestamp NOT NULL DEFAULT (now()),
-  "proposed_by_user_id" int NOT NULL
+  "proposed_by_user_id" int NOT NULL,
+  "user_read_only" boolean NOT NULL DEFAULT false
 );
 
 CREATE TABLE "events_calendars" (

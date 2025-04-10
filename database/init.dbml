@@ -83,6 +83,7 @@ Table events {
   created_at timestamp [default: `now()`, not null] // iCalendar CREATED
   updated_at timestamp [default: `now()`, not null] // iCalendar LAST-MODIFIED
   proposed_by_user_id int [not null] // User who created/imported the event
+  user_read_only boolean [default: false, not null] // imported events are read-only
 }
 Ref: events.proposed_by_user_id > users.id [delete: cascade]
 
