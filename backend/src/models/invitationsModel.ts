@@ -17,42 +17,44 @@ export const InvitationDTO = {
   getNewInvitations: async (
     user_id: number
   ): Promise<NewInvitationsResponse[]> => {
-    const invitations = await sql`SELECT * FROM invitations 
+    const invitations: Invitation[] = await sql`
+      SELECT * FROM invitations 
       WHERE user_id = ${user_id}
-      AND status = 'needs-action'`;
+      AND status = 'needs-action'
+    `;
 
-    const result: NewInvitationsResponse[] = [];
+    return await Promise.all(
+      invitations.map(async (invitation) => {
+        // selecting the required fields from calendar
+        const calendar = await sql`
+          SELECT name, description
+          FROM calendars
+          WHERE id = ${invitation.calendar_id}
+        `;
 
-    // forming the response body
-    for (const invitation of invitations) {
-      // selecting the required fields from calendar
-      const calendar = await sql`
-      SELECT name, description
-      FROM calendars
-      WHERE id = ${invitation.calendar_id}`;
+        // getting the current members of the calendar
+        const members = await sql`
+          SELECT users.username, users.email
+          FROM memberships
+          JOIN users ON memberships.user_id = users.id
+          WHERE memberships.calendar_id = ${invitation.calendar_id}
+        `;
 
-      // getting the current members of the calendar
-      const members = await sql`
-      SELECT users.username, users.email
-      FROM memberships
-      JOIN users ON memberships.user_id = users.id
-      WHERE memberships.calendar_id = ${invitation.calendar_id}
-      `;
+        // pushing the required fields to the result array
+        const invitationResponse: NewInvitationsResponse = {
+          id: invitation.id,
+          calendar_id: invitation.calendar_id,
+          name: calendar[0].name,
+          description: calendar[0].description,
+          members: members.map((m: any) => ({
+            username: m.username,
+            email: m.email,
+          })),
+        };
 
-      // pushing the required fields to the result array
-      result.push({
-        id: invitation.id,
-        calendar_id: invitation.calendar_id,
-        name: calendar[0].name,
-        description: calendar[0].description,
-        members: members.map((m: any) => ({
-          username: m.username,
-          email: m.email,
-        })),
-      });
-    }
-
-    return result;
+        return invitationResponse;
+      })
+    );
   },
   updateInvitation: async (
     invitation: InvitationModelForUpdate

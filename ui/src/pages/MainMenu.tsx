@@ -1,47 +1,39 @@
 import { CalendarList } from "@/components/CalendarList";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { Calendar, NewInvitationsResponse } from "../../types";
 //import { Button } from "@/components/ui/button";
 import { PlusIcon, ArrowDownIcon } from "@heroicons/react/24/outline";
 import { InvitationsList } from "@/components/InvitationsList";
 import { Button } from "@/components/ui/button";
+import { useCalendarService } from "@/services/calendar";
+import { useInvitationService } from "@/services/invitation";
 
 export const MainMenu = () => {
+  const { fetchCalendars } = useCalendarService();
+  const { fetchInvitations } = useInvitationService();
+
   const [personalCalendars, setPersonalCalendars] = useState<Calendar[]>([]);
   const [groupCalendars, setGroupCalendars] = useState<Calendar[]>([]);
   const [invitations, setInvitations] = useState<NewInvitationsResponse[]>([]);
 
+  const getCalendars = async () => {
+    const calendars = await fetchCalendars();
+    if (!calendars) return;
+
+    setPersonalCalendars(calendars.filter((calendar) => !calendar.is_group));
+    setGroupCalendars(calendars.filter((calendar) => calendar.is_group));
+  };
+
+  const getInvitations = async () => {
+    const invitations = await fetchInvitations();
+    if (!invitations) return;
+
+    setInvitations(invitations);
+  };
+
   useEffect(() => {
-    const fetchCalendars = async () => {
-      try {
-        const response = await axios.get<Calendar[]>(
-          "https://backend.localhost/calendars"
-        );
-        setPersonalCalendars(
-          response.data.filter((calendar) => !calendar.is_group)
-        );
-        setGroupCalendars(
-          response.data.filter((calendar) => calendar.is_group)
-        );
-      } catch (error) {
-        console.error("Error fetching calendars:", error);
-      }
-    };
-
-    const fetchInvitations = async () => {
-      try {
-        const response = await axios.get<NewInvitationsResponse[]>(
-          "https://backend.localhost/new-invites"
-        );
-        setInvitations(response.data);
-      } catch (error) {
-        console.error("Error fetching calendars:", error);
-      }
-    };
-
-    fetchCalendars();
-    fetchInvitations();
+    getCalendars();
+    getInvitations();
   }, []);
 
   return (

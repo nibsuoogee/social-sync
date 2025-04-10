@@ -10,3 +10,5 @@ export type {
   InvitationUpdateBody,
   NewInvitationsResponse,
 } from "../backend/src/models/invitationsModel";
+
+export type { Event } from "../backend/src/models/eventsModel";
