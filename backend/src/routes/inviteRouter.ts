@@ -5,6 +5,7 @@ import {
   invitationBody,
   InvitationBody,
   InvitationDTO,
+  invitationModel,
   InvitationModelForUpdate,
   invitationUpdateBody,
   InvitationUpdateBody,
@@ -76,8 +77,27 @@ export const inviteRouter = new Elysia()
             },
           }
         )
+        .get(
+          "/new-invites",
+          async ({ user, error }) => {
+            // 1) get the user's invites with the status "needs-action"
+            const [invitations, err] = await tryCatch(
+              InvitationDTO.getNewInvitations(user.id)
+            );
+            if (err) return error(500, err.message);
+            if (!invitations) return error(500, "Failed to get invitations");
+
+            return invitations;
+          },
+          {
+            response: {
+              200: t.Array(invitationModel),
+              500: t.String(),
+            },
+          }
+        )
         .patch(
-          "/invitation",
+          "/invite",
           async ({ body, user, error }) => {
             // 1) Update the invitation
             const invitationUpdate: InvitationModelForUpdate = {

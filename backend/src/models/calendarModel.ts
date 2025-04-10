@@ -15,8 +15,11 @@ export const CalendarDTO = {
     return newCalendar;
   },
   getCalendars: async (user_id: number): Promise<Calendar[]> => {
-    const calendars = await sql`SELECT * FROM calendars 
-      WHERE owner_user_id = ${user_id}`;
+    const calendars = await sql`
+      SELECT calendars.*
+      FROM calendars
+      JOIN memberships ON calendars.id = memberships.calendar_id
+      WHERE memberships.user_id = ${user_id}`;
     return [...calendars];
   },
   updateCalendar: async (
