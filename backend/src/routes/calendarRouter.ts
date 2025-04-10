@@ -73,7 +73,7 @@ export const calendarRouter = new Elysia()
         .get(
           "/calendars",
           async ({ user, error }) => {
-            // 1) get the user's calendars
+            // 1) get the calendars which the user has a membership for
             const [calendars, err] = await tryCatch(
               CalendarDTO.getCalendars(user.id)
             );
