@@ -1,10 +1,12 @@
 import { Button, Input } from "@mui/joy";
-import axios from "axios";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useUserService } from "@/services/user";
 
 export const Register = () => {
+  const { postRegister } = useUserService();
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,25 +16,22 @@ export const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      // Send register request to the auth server
-      const response = await axios.post("https://auth.localhost/register", {
-        username,
-        email,
-        password,
-      });
+    // Send register request to the auth server
+    const auth = await postRegister({
+      username,
+      email,
+      password,
+    });
+    if (!auth) return;
 
-      // Extract the access token from the response
-      const { access_token } = response.data;
-      console.log(access_token);
-      // Update authentication state using the context
-      register(access_token);
+    // Extract the access token from the response
+    const { access_token } = auth;
 
-      // Redirect to the home page or dashboard
-      navigate("/main-menu");
-    } catch (err) {
-      console.error("Register error:", err);
-    }
+    // Update authentication state using the context
+    register(access_token);
+
+    // Redirect to the home page or dashboard
+    navigate("/main-menu");
   };
 
   const navigateToLogin = () => {

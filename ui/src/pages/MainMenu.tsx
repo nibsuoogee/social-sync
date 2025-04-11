@@ -9,31 +9,31 @@ import { useCalendarService } from "@/services/calendar";
 import { useInvitationService } from "@/services/invitation";
 
 export const MainMenu = () => {
-  const { fetchCalendars } = useCalendarService();
-  const { fetchInvitations } = useInvitationService();
+  const { getCalendars } = useCalendarService();
+  const { getInvitations } = useInvitationService();
 
   const [personalCalendars, setPersonalCalendars] = useState<Calendar[]>([]);
   const [groupCalendars, setGroupCalendars] = useState<Calendar[]>([]);
   const [invitations, setInvitations] = useState<NewInvitationsResponse[]>([]);
 
-  const getCalendars = async () => {
-    const calendars = await fetchCalendars();
+  const getCalendarsRequest = async () => {
+    const calendars = await getCalendars();
     if (!calendars) return;
 
     setPersonalCalendars(calendars.filter((calendar) => !calendar.is_group));
     setGroupCalendars(calendars.filter((calendar) => calendar.is_group));
   };
 
-  const getInvitations = async () => {
-    const invitations = await fetchInvitations();
+  const getInvitationsRequest = async () => {
+    const invitations = await getInvitations();
     if (!invitations) return;
 
     setInvitations(invitations);
   };
 
   useEffect(() => {
-    getCalendars();
-    getInvitations();
+    getCalendarsRequest();
+    getInvitationsRequest();
   }, []);
 
   return (
