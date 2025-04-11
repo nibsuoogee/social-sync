@@ -1,6 +1,6 @@
 import { CalendarList } from "@/components/CalendarList";
 import { useEffect, useState } from "react";
-import { Calendar, NewInvitationsResponse } from "../../types";
+import { Calendar, NewInvitationsResponse } from "@types";
 //import { Button } from "@/components/ui/button";
 import { PlusIcon, ArrowDownIcon } from "@heroicons/react/24/outline";
 import { InvitationsList } from "@/components/InvitationsList";

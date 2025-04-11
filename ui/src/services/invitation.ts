@@ -5,12 +5,12 @@ import {
   InvitationBody,
   InvitationUpdateBody,
   NewInvitationsResponse,
-} from "types";
+} from "@types";
 
 export const useInvitationService = () => {
   const postInvite = async (body: InvitationBody) => {
     return handleApiRequest<string>(() =>
-      axios.post(`${BACKEND_URL}/invite/`, { body })
+      axios.post(`${BACKEND_URL}/invite/`, body)
     );
   };
 
@@ -22,7 +22,7 @@ export const useInvitationService = () => {
 
   const patchInvitation = async (body: InvitationUpdateBody) => {
     return handleApiRequest<string>(() =>
-      axios.patch(`${BACKEND_URL}/invite/`, { body })
+      axios.patch(`${BACKEND_URL}/invite/`, body)
     );
   };
 

@@ -3,7 +3,7 @@
  */
 import { UserIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 
-import { Calendar } from "../../types";
+import { Calendar } from "@types";
 import { Button } from "./ui/button";
 
 export const CalendarListElement = ({ calendar }: { calendar: Calendar }) => {

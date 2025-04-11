@@ -6,7 +6,7 @@ import {
   CalendarCreateBody,
   CalendarUpdateBody,
   Membership,
-} from "types";
+} from "@types";
 
 interface PostCalendarResponse {
   calendar: Calendar;
@@ -16,7 +16,7 @@ interface PostCalendarResponse {
 export const useCalendarService = () => {
   const postCalendar = async (body: CalendarCreateBody) => {
     return handleApiRequest<PostCalendarResponse>(() =>
-      axios.post(`${BACKEND_URL}/calendar/`, { body })
+      axios.post(`${BACKEND_URL}/calendar/`, body)
     );
   };
 
@@ -28,7 +28,7 @@ export const useCalendarService = () => {
 
   const patchCalendar = async (body: CalendarUpdateBody) => {
     return handleApiRequest<Calendar>(() =>
-      axios.patch(`${BACKEND_URL}/calendar/`, { body })
+      axios.patch(`${BACKEND_URL}/calendar/`, body)
     );
   };
 

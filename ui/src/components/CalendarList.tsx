@@ -3,7 +3,7 @@
  */
 
 import { CalendarListElement } from "./CalendarListElement";
-import { Calendar } from "../../types";
+import { Calendar } from "@types";
 
 export const CalendarList = ({ calendars }: { calendars: Calendar[] }) => {
   return (

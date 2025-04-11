@@ -3,7 +3,7 @@
  */
 import { UserGroupIcon } from "@heroicons/react/24/outline";
 
-import { NewInvitationsResponse } from "../../types";
+import { NewInvitationsResponse } from "@types";
 import { Button } from "./ui/button";
 
 export const InvitationListElement = ({

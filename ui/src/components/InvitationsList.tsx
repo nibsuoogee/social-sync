@@ -2,7 +2,7 @@
  * List of invites shown in the main menu.
  */
 
-import { NewInvitationsResponse } from "../../types";
+import { NewInvitationsResponse } from "@types";
 import { InvitationListElement } from "./InvitationListElement";
 
 export const InvitationsList = ({
