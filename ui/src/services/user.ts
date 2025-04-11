@@ -7,18 +7,15 @@ import {
   UserModelForRegistration,
 } from "@types";
 
-export const useUserService = () => {
-  const postRegister = async (body: UserModelForRegistration) => {
+export const userService = {
+  postRegister: async (body: UserModelForRegistration) => {
     return handleApiRequest<AccessToken>(() =>
       axios.post(`${AUTH_URL}/register/`, body)
     );
-  };
-
-  const postLogin = async (body: UserModelForLogin) => {
+  },
+  postLogin: async (body: UserModelForLogin) => {
     return handleApiRequest<AccessToken>(() =>
       axios.post(`${AUTH_URL}/login/`, body)
     );
-  };
-
-  return { postRegister, postLogin };
+  },
 };
