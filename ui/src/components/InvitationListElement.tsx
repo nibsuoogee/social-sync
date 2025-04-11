@@ -14,7 +14,7 @@ export const InvitationListElement = ({
   return (
     <Button
       variant={"outline"}
-      className="w-full flex items-center justify-start mb-2"
+      className="w-full flex items-center justify-start mb-2 border-dashed border-black"
     >
       <UserGroupIcon className="size-6 ml-4" />
 
