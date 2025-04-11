@@ -1,0 +1,198 @@
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+}
+
+/* Header */
+.header {
+  background-color: #007bff;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  position: relative;
+}
+
+.sign-out-button {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  background-color: #fff;
+  color: #007bff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.sign-out-button:hover {
+  background-color: #e0e0e0;
+}
+
+/* Personal Calendars */
+.personal-calendars {
+  text-align: center;
+  margin: 20px;
+}
+
+.personal-calendars h3 {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.calendar-boxes {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.box {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 10px;
+  width: 120px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.box:hover {
+  background-color: #f0f0f0;
+}
+
+/* Info Box */
+.info-box {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px auto;
+  width: 300px;
+  text-align: left;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Icons */
+.icon-events::before {
+  content: "📅";
+  display: block;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.icon-school::before {
+  content: "🎓";
+  display: block;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.icon-work::before {
+  content: "💼";
+  display: block;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.icon-recreation::before {
+  content: "⚽";
+  display: block;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.icon-create::before {
+  content: "✏️";
+  display: block;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.icon-import::before {
+  content: "📥";
+  display: block;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+/* Calendar Container */
+.calendar {
+  width: 100%;
+  max-width: 800px;
+  margin: 50px auto;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Calendar Header */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #007bff;
+  color: #fff;
+}
+
+.calendar-header h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.calendar-header button {
+  background-color: #fff;
+  color: #007bff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.calendar-header button:hover {
+  background-color: #e0e0e0;
+}
+
+/* Calendar Days */
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.calendar-days div {
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+}
+
+/* Calendar Dates */
+.calendar-dates {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 20px;
+}
+
+.calendar-dates div {
+  text-align: center;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+}
+
+.calendar-dates div:hover {
+  background-color: #f0f0f0;
+}
+
+.calendar-dates .today {
+  background-color: #007bff;
+  color: #fff;
+}
