@@ -2,7 +2,6 @@ import { CalendarList } from "@/components/CalendarList";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Calendar, NewInvitationsResponse } from "../../types";
-//import { Button } from "@/components/ui/button";
 import { PlusIcon, ArrowDownIcon } from "@heroicons/react/24/outline";
 import { InvitationsList } from "@/components/InvitationsList";
 import { Button } from "@/components/ui/button";
@@ -36,7 +35,7 @@ export const MainMenu = () => {
         );
         setInvitations(response.data);
       } catch (error) {
-        console.error("Error fetching calendars:", error);
+        console.error("Error fetching invitations:", error);
       }
     };
 
@@ -45,32 +44,46 @@ export const MainMenu = () => {
   }, []);
 
   return (
-    <div>
-      <div className="flex flex-row justify-center">
-        <div className="flex flex-col w-128 flex-initial">
-          <div className="p-6 flex flex-col">
-            <h2 className="font-mono text-left mb-2">Personal Calendars</h2>
-            <CalendarList calendars={personalCalendars}></CalendarList>
-            <Button variant={"outline"}>
+    <div className="flex flex-col gap-4 p-6">
+      <div className="flex flex-col md:w-1/2">
+        <div className="flex flex-col">
+          <h2 className="font-mono text-left mb-2">Personal Calendars</h2>
+          <CalendarList calendars={personalCalendars}></CalendarList>
+          <div className="flex flex-col mt-2 sm:flex-row gap-2">
+            <Button
+              variant={"outline"}
+              className=" flex-1 border-double border-4  border-gray-500
+              hover:border-gray-800"
+            >
               <PlusIcon className="flex items-center justify-start" />
               Create
             </Button>
-            <Button variant={"outline"} className="mt-2">
+            <Button
+              variant={"outline"}
+              className="flex-1 border-double border-4 border-gray-500
+              hover:border-gray-800"
+            >
               <ArrowDownIcon className="flex items-center justify-start" />
               Import
             </Button>
           </div>
-          <div className="p-4 flex flex-col">
-            <h2 className="font-mono text-left mb-2">Group Calendars</h2>
-            <CalendarList calendars={groupCalendars}></CalendarList>
-            <Button variant={"outline"}>
-              <PlusIcon className="flex items-center justify-start" />
-              Create
-            </Button>
-          </div>
         </div>
+      </div>
 
-        <div className="flex flex-col w-128 flex-initial">
+      <div className="flex flex-col md:flex-row gap-4 mt-8">
+        <div className="flex flex-col md:w-1/2">
+          <h2 className="font-mono text-left mb-2">Group Calendars</h2>
+          <CalendarList calendars={groupCalendars}></CalendarList>
+          <Button
+            variant={"outline"}
+            className="border-double border-4  border-gray-500
+              hover:border-gray-800 mt-2"
+          >
+            <PlusIcon className="flex items-center justify-start" />
+            Create
+          </Button>
+        </div>
+        <div className="md:w-1/2">
           <h2 className="font-mono text-left mb-2">
             Group calendar Invitations
           </h2>

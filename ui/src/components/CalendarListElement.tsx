@@ -10,7 +10,7 @@ export const CalendarListElement = ({ calendar }: { calendar: Calendar }) => {
   return (
     <Button
       variant={"outline"}
-      className="w-full flex items-center justify-start mb-2"
+      className="w-full flex items-center justify-start mb-2  border-black"
     >
       {calendar.is_group ? (
         <UserGroupIcon

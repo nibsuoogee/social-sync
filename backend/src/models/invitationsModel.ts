@@ -17,9 +17,11 @@ export const InvitationDTO = {
   getNewInvitations: async (
     user_id: number
   ): Promise<NewInvitationsResponse[]> => {
-    const invitations = await sql`SELECT * FROM invitations 
+    const invitations = await sql`
+      SELECT * FROM invitations 
       WHERE user_id = ${user_id}
-      AND status = 'needs-action'`;
+      AND status = 'needs-action'
+    `;
 
     const result: NewInvitationsResponse[] = [];
 
@@ -27,16 +29,17 @@ export const InvitationDTO = {
     for (const invitation of invitations) {
       // selecting the required fields from calendar
       const calendar = await sql`
-      SELECT name, description
-      FROM calendars
-      WHERE id = ${invitation.calendar_id}`;
+        SELECT name, description
+        FROM calendars
+        WHERE id = ${invitation.calendar_id}
+      `;
 
       // getting the current members of the calendar
       const members = await sql`
-      SELECT users.username, users.email
-      FROM memberships
-      JOIN users ON memberships.user_id = users.id
-      WHERE memberships.calendar_id = ${invitation.calendar_id}
+        SELECT users.username, users.email
+        FROM memberships
+        JOIN users ON memberships.user_id = users.id
+        WHERE memberships.calendar_id = ${invitation.calendar_id}
       `;
 
       // pushing the required fields to the result array
