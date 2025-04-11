@@ -7,24 +7,20 @@ import {
   NewInvitationsResponse,
 } from "@types";
 
-export const useInvitationService = () => {
-  const postInvite = async (body: InvitationBody) => {
+export const invitationService = {
+  postInvite: async (body: InvitationBody) => {
     return handleApiRequest<string>(() =>
       axios.post(`${BACKEND_URL}/invite/`, body)
     );
-  };
-
-  const getInvitations = async () => {
+  },
+  getInvitations: async () => {
     return handleApiRequest<NewInvitationsResponse[]>(() =>
       axios.get(`${BACKEND_URL}/new-invites/`)
     );
-  };
-
-  const patchInvitation = async (body: InvitationUpdateBody) => {
+  },
+  patchInvitation: async (body: InvitationUpdateBody) => {
     return handleApiRequest<string>(() =>
       axios.patch(`${BACKEND_URL}/invite/`, body)
     );
-  };
-
-  return { postInvite, getInvitations, patchInvitation };
+  },
 };

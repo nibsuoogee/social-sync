@@ -2,10 +2,9 @@ import { Button, Input } from "@mui/joy";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useUserService } from "@/services/user";
+import { userService } from "@/services/user";
 
 export const Login = () => {
-  const { postLogin } = useUserService();
   const { login } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -16,7 +15,7 @@ export const Login = () => {
     e.preventDefault();
 
     // Send login request to the auth server
-    const auth = await postLogin({
+    const auth = await userService.postLogin({
       email,
       password,
     });

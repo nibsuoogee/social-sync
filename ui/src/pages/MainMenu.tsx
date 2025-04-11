@@ -5,19 +5,16 @@ import { Calendar, NewInvitationsResponse } from "@types";
 import { PlusIcon, ArrowDownIcon } from "@heroicons/react/24/outline";
 import { InvitationsList } from "@/components/InvitationsList";
 import { Button } from "@/components/ui/button";
-import { useCalendarService } from "@/services/calendar";
-import { useInvitationService } from "@/services/invitation";
 import {
   PopoverTrigger,
   Popover,
   PopoverContent,
 } from "@/components/ui/popover";
 import { CreateCalendarCard } from "@/components/CreateCalendarCard";
+import { calendarService } from "@/services/calendar";
+import { invitationService } from "@/services/invitation";
 
 export const MainMenu = () => {
-  const { getCalendars } = useCalendarService();
-  const { getInvitations } = useInvitationService();
-
   const [personalCalendars, setPersonalCalendars] = useState<Calendar[]>([]);
   const [groupCalendars, setGroupCalendars] = useState<Calendar[]>([]);
   const [invitations, setInvitations] = useState<NewInvitationsResponse[]>([]);
@@ -40,7 +37,7 @@ export const MainMenu = () => {
   };
 
   const getCalendarsRequest = async () => {
-    const calendars = await getCalendars();
+    const calendars = await calendarService.getCalendars();
     if (!calendars) return;
 
     setPersonalCalendars(calendars.filter((calendar) => !calendar.is_group));
@@ -48,7 +45,7 @@ export const MainMenu = () => {
   };
 
   const getInvitationsRequest = async () => {
-    const invitations = await getInvitations();
+    const invitations = await invitationService.getInvitations();
     if (!invitations) return;
 
     setInvitations(invitations);
