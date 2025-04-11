@@ -11,6 +11,11 @@ export const MainMenu = () => {
   const [groupCalendars, setGroupCalendars] = useState<Calendar[]>([]);
   const [invitations, setInvitations] = useState<NewInvitationsResponse[]>([]);
 
+  const handleDeleteCalendar = (id: number) => {
+    setPersonalCalendars((prev) => prev.filter((cal) => cal.id !== id));
+    setGroupCalendars((prev) => prev.filter((cal) => cal.id !== id));
+  };
+
   useEffect(() => {
     const fetchCalendars = async () => {
       try {
@@ -47,8 +52,13 @@ export const MainMenu = () => {
     <div className="flex flex-col gap-4 p-6">
       <div className="flex flex-col md:w-1/2">
         <div className="flex flex-col">
-          <h2 className="font-mono text-left mb-2">Personal Calendars</h2>
-          <CalendarList calendars={personalCalendars}></CalendarList>
+          <h2 className="font-mono text-left mb-2 text-lg">
+            Personal Calendars
+          </h2>
+          <CalendarList
+            calendars={personalCalendars}
+            onDelete={handleDeleteCalendar}
+          ></CalendarList>
           <div className="flex flex-col mt-2 sm:flex-row gap-2">
             <Button
               variant={"outline"}
@@ -70,10 +80,13 @@ export const MainMenu = () => {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 mt-8">
+      <div className="flex flex-col md:flex-row gap-4">
         <div className="flex flex-col md:w-1/2">
-          <h2 className="font-mono text-left mb-2">Group Calendars</h2>
-          <CalendarList calendars={groupCalendars}></CalendarList>
+          <h2 className="font-mono text-left mb-2 text-lg">Group Calendars</h2>
+          <CalendarList
+            calendars={groupCalendars}
+            onDelete={handleDeleteCalendar}
+          ></CalendarList>
           <Button
             variant={"outline"}
             className="border-double border-4  border-gray-500
@@ -84,7 +97,7 @@ export const MainMenu = () => {
           </Button>
         </div>
         <div className="md:w-1/2">
-          <h2 className="font-mono text-left mb-2">
+          <h2 className="font-mono text-left mb-2 text-lg">
             Group calendar Invitations
           </h2>
           <InvitationsList invitations={invitations}></InvitationsList>
