@@ -99,16 +99,20 @@ services:
       - cloud_project
 
   proposals:
-    build: .
+    build: 
+      context: ./proposals
     container_name: proposals_service
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.proposals.rule=PathPrefix(`/generate-proposals`)"
-      - "traefik.http.services.proposals.loadbalancer.server.port=8000"
-      - "traefik.http.routers.proposals.tls=true"
-      - "traefik.http.services.proposals.loadbalancer.server.port=3000"
+    volumes:
+      - ./app:/app
+      - hf_cache:/root/.cache/huggingface
     networks:
       - cloud_project
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.proposals.rule=Host(`proposals.localhost`)"
+      - "traefik.http.routers.proposals.entrypoints=websecure"
+      - "traefik.http.routers.proposals.tls=true"
+      - "traefik.http.services.proposals.loadbalancer.server.port=8000"
     restart: unless-stopped
 
 
@@ -116,3 +120,6 @@ networks:
   cloud_project:
     name: cloud_project # We are creating a network with the name cloud_project
     driver: bridge # We are using the bridge driver
+    
+volumes:
+  hf_cache:
