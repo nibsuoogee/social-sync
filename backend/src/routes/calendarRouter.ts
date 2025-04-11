@@ -4,7 +4,6 @@ import { authorizationMiddleware } from "../middleware/authorization";
 import {
   CalendarDTO,
   CalendarModelForCreation,
-  CalendarModelForUpdate,
   calendarCreateBody,
   calendarModel,
   calendarUpdateBody,

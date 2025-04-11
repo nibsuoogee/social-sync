@@ -16,7 +16,6 @@ import {
 } from "src/models/attendanceModel";
 import { tryCatch } from "@shared/src/tryCatch";
 import { MembershipDTO } from "src/models/membershipModel";
-import { EventsCalendarsDTO } from "src/models/eventsCalendarsModel";
 
 export const eventRouter = new Elysia()
   .use(jwtConfig)
