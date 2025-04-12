@@ -68,7 +68,7 @@ export const MainMenu = () => {
               <PopoverTrigger asChild>
                 <Button
                   variant={"outline"}
-                  className=" flex-1 border-double border-4  border-gray-500
+                  className=" flex-1 border-double border-4 border-gray-500
               hover:border-gray-800"
                 >
                   <PlusIcon className="flex items-center justify-start" />

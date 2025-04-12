@@ -10,7 +10,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { MainMenu } from "./pages/MainMenu";
 import { AuthProvider } from "./contexts/AuthContext";
 import { PageShell } from "./components/PageShell";
-import { Calendar } from "./pages/Calendar";
+import { EventsProvider } from "@/contexts/EventsContext";
+import ProtectedLayout from "@/components/ProtectedLayout";
+import { CalendarPage } from "@/pages/CalendarPage";
 
 function App() {
   useEffect(() => {
@@ -45,25 +47,25 @@ function App() {
       <AuthProvider>
         <PageShell>
           <Routes>
+            {/* Public routes — no context */}
             <Route path="/" element={<Frontpage />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+
+            {/* Protected route group */}
             <Route
-              path="/main-menu"
               element={
                 <ProtectedRoute>
-                  <MainMenu />
+                  {/* Event context provider */}
+                  <EventsProvider>
+                    <ProtectedLayout />
+                  </EventsProvider>
                 </ProtectedRoute>
               }
-            />
-            <Route
-              path="/calendar"
-              element={
-                <ProtectedRoute>
-                  <Calendar />
-                </ProtectedRoute>
-              }
-            />
+            >
+              <Route path="/main-menu" element={<MainMenu />} />
+              <Route path="/calendar/:calendar_id" element={<CalendarPage />} />
+            </Route>
           </Routes>
         </PageShell>
       </AuthProvider>

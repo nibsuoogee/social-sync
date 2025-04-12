@@ -91,35 +91,6 @@ export const eventRouter = new Elysia()
             },
           }
         )
-        .get(
-          "/events/:calendar_id",
-          async ({ params, user, error }) => {
-            // 1) check if the user has a membership in the calendar
-            const [hasMembership, errMembership] = await tryCatch(
-              MembershipDTO.hasMembership(params.calendar_id, user.id)
-            );
-            if (errMembership) return error(500, errMembership.message);
-            if (!hasMembership)
-              return error(401, "No authorized access to calendar");
-
-            // 2) get all events in the calendar
-            const [events, err] = await tryCatch(
-              EventDTO.getEvents(params.calendar_id)
-            );
-            if (err) return error(500, err.message);
-            if (!events) return error(500, "Failed to get events");
-
-            return events;
-          },
-          {
-            params: t.Object({ calendar_id: t.Integer() }),
-            response: {
-              200: t.Array(eventModel),
-              401: t.String(),
-              500: t.String(),
-            },
-          }
-        )
         .patch(
           "/event",
           async ({ body, user, error }) => {

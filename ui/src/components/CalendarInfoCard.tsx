@@ -2,6 +2,7 @@ import { Calendar } from "types";
 import { Button } from "./ui/button";
 import { calendarService } from "@/services/calendar";
 import { useCalendarListContext } from "@/contexts/CalendarListContext";
+import { useNavigate } from "react-router-dom";
 
 /**
  * This is shown when a user clicks on a calendar on the main menu.
@@ -9,6 +10,7 @@ import { useCalendarListContext } from "@/contexts/CalendarListContext";
  */
 export const CalendarInfoCard = ({ calendar }: { calendar: Calendar }) => {
   const { contextDeleteCalendar } = useCalendarListContext();
+  const navigate = useNavigate();
 
   const deleteCalendar = async () => {
     calendarService.deleteCalendar(calendar.id);
@@ -16,6 +18,11 @@ export const CalendarInfoCard = ({ calendar }: { calendar: Calendar }) => {
     // is remove instantly without checking if the server agrees
 
     contextDeleteCalendar(calendar.id);
+  };
+
+  const openCalendar = async () => {
+    // navigate to the calendar
+    navigate(`/calendar/${calendar.id}`);
   };
 
   return (
@@ -45,7 +52,11 @@ export const CalendarInfoCard = ({ calendar }: { calendar: Calendar }) => {
           </Button>
         )}
 
-        <Button variant={"outline"} className="border-black w-20">
+        <Button
+          onClick={openCalendar}
+          variant={"outline"}
+          className="border-black w-20"
+        >
           Open
         </Button>
       </div>

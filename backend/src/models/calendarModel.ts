@@ -22,6 +22,13 @@ export const CalendarDTO = {
       WHERE memberships.user_id = ${user_id}`;
     return [...calendars];
   },
+  getCalendar: async (calendar_id: number): Promise<Calendar> => {
+    const [calendar] = await sql`
+      SELECT * FROM calendars
+      WHERE id = ${calendar_id}
+    `;
+    return calendar;
+  },
   updateCalendar: async (
     calendar_id: number,
     calendar: CalendarModelForUpdate
