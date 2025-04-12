@@ -44,13 +44,13 @@ export const Login = () => {
           type="email"
           onChange={(e) => setEmail(e.target.value)}
           required
-        ></Input>
+        />
         <Input
           placeholder="Password"
           type="password"
           onChange={(e) => setPassword(e.target.value)}
           required
-        ></Input>
+        />
         <Button type="submit">Login</Button>
       </form>
       <Button onClick={navigateToRegister}>Register</Button>

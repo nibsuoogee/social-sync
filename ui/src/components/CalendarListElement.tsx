@@ -1,34 +1,13 @@
-/**
- * a single calendar list elements shown in the main menu.
- */
 import { UserIcon, UserGroupIcon } from "@heroicons/react/24/outline";
-
 import { Calendar } from "@types";
 import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { CalendarInfoCard } from "./CalendarInfoCard";
-import { useEffect, useState } from "react";
 
-export const CalendarListElement = ({
-  calendar,
-  onDelete,
-}: {
-  calendar: Calendar;
-  onDelete: (id: number) => void;
-}) => {
-  const [side, setSide] = useState<"right" | "bottom">("right");
-
-  // for knowing which side to render the calendar info card
-  useEffect(() => {
-    const handleResize = () => {
-      setSide(window.innerWidth < 768 ? "bottom" : "right");
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
+/**
+ * a single calendar list elements shown in the main menu.
+ */
+export const CalendarListElement = ({ calendar }: { calendar: Calendar }) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -51,11 +30,12 @@ export const CalendarListElement = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        side={side}
+        flipXonMdScreenWidth
+        side="right"
         align="start"
         className="flex w-80 border-black"
       >
-        <CalendarInfoCard calendar={calendar} onDelete={onDelete} />
+        <CalendarInfoCard calendar={calendar} />
       </PopoverContent>
     </Popover>
   );
