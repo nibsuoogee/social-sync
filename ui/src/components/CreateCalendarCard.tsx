@@ -3,7 +3,6 @@
  */
 
 import { Button } from "./ui/button";
-import axios from "axios";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,10 +15,12 @@ import {
   FormControl,
 } from "./ui/form";
 import { Input } from "./ui/input";
+import { calendarService } from "@/services/calendar";
+import { Calendar } from "@types";
 
 const calendarFormSchema = z.object({
-  color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
-    message: "Color must be a valid hex code (e.g., #ff0000 or #f00).",
+  color: z.string().regex(/^#([A-Fa-f0-9]{6})$/, {
+    message: "Color must be a valid hex code (e.g., #ff0000).",
   }),
   title: z.string().min(2, {
     message: "Title must be at least 2 characters.",
@@ -29,7 +30,11 @@ const calendarFormSchema = z.object({
   }),
 });
 
-export const CreateCalendarCard = () => {
+export const CreateCalendarCard = ({
+  addCalendar,
+}: {
+  addCalendar: (calendar: Calendar) => void;
+}) => {
   // 1. defining form
   const form = useForm<z.infer<typeof calendarFormSchema>>({
     resolver: zodResolver(calendarFormSchema),
@@ -42,13 +47,14 @@ export const CreateCalendarCard = () => {
 
   // 2. defining submit handler
   async function onSubmit(values: z.infer<typeof calendarFormSchema>) {
-    await axios.post("https://backend.localhost/calendar", {
+    const result = await calendarService.postCalendar({
       name: values.title,
       description: values.description,
       is_group: false,
       color: values.color,
     });
-    console.log(values);
+    if (!result) return;
+    addCalendar(result.calendar);
   }
 
   return (

@@ -31,9 +31,7 @@ export const calendarService = {
   },
   deleteCalendar: async (calendar_id: number) => {
     return handleApiRequest<string>(() =>
-      axios.delete(`${BACKEND_URL}/calendar/`, {
-        params: { calendar_id },
-      })
+      axios.delete(`${BACKEND_URL}/calendar/${calendar_id}`)
     );
   },
 };

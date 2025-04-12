@@ -45,19 +45,19 @@ export const Register = () => {
           type="username"
           onChange={(e) => setUsername(e.target.value)}
           required
-        ></Input>
+        />
         <Input
           placeholder="E-mail"
           type="email"
           onChange={(e) => setEmail(e.target.value)}
           required
-        ></Input>
+        />
         <Input
           placeholder="Password"
           type="password"
           onChange={(e) => setPassword(e.target.value)}
           required
-        ></Input>
+        />
         <Button type="submit">Register</Button>
       </form>
       <Button onClick={navigateToLogin}>Login</Button>

@@ -1,22 +1,21 @@
+import { Calendar } from "types";
+import { Button } from "./ui/button";
+import { calendarService } from "@/services/calendar";
+import { useCalendarListContext } from "@/contexts/CalendarListContext";
+
 /**
  * This is shown when a user clicks on a calendar on the main menu.
  * It shows the name of the calendar, the color of the calendar, and the description
  */
+export const CalendarInfoCard = ({ calendar }: { calendar: Calendar }) => {
+  const { contextDeleteCalendar } = useCalendarListContext();
 
-import { Calendar } from "types";
-import { Button } from "./ui/button";
-import axios from "axios";
-
-export const CalendarInfoCard = ({
-  calendar,
-  onDelete,
-}: {
-  calendar: Calendar;
-  onDelete: (id: number) => void;
-}) => {
   const deleteCalendar = async () => {
-    await axios.delete(`https://backend.localhost/calendar/${calendar.id}`);
-    onDelete(calendar.id);
+    calendarService.deleteCalendar(calendar.id);
+    // We could await a result, but UX is better if the calendar
+    // is remove instantly without checking if the server agrees
+
+    contextDeleteCalendar(calendar.id);
   };
 
   return (

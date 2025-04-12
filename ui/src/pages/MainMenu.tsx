@@ -1,7 +1,6 @@
 import { CalendarList } from "@/components/CalendarList";
 import { useEffect, useState } from "react";
 import { Calendar, NewInvitationsResponse } from "@types";
-//import { Button } from "@/components/ui/button";
 import { PlusIcon, ArrowDownIcon } from "@heroicons/react/24/outline";
 import { InvitationsList } from "@/components/InvitationsList";
 import { Button } from "@/components/ui/button";
@@ -13,23 +12,12 @@ import {
 import { CreateCalendarCard } from "@/components/CreateCalendarCard";
 import { calendarService } from "@/services/calendar";
 import { invitationService } from "@/services/invitation";
+import { CalendarListContext } from "@/contexts/CalendarListContext";
 
 export const MainMenu = () => {
   const [personalCalendars, setPersonalCalendars] = useState<Calendar[]>([]);
   const [groupCalendars, setGroupCalendars] = useState<Calendar[]>([]);
   const [invitations, setInvitations] = useState<NewInvitationsResponse[]>([]);
-  const [side, setSide] = useState<"right" | "bottom">("right");
-
-  // for knowing which side to render the calendar info card
-  useEffect(() => {
-    const handleResize = () => {
-      setSide(window.innerWidth < 768 ? "bottom" : "right");
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const handleDeleteCalendar = (id: number) => {
     setPersonalCalendars((prev) => prev.filter((cal) => cal.id !== id));
@@ -51,6 +39,10 @@ export const MainMenu = () => {
     setInvitations(invitations);
   };
 
+  const handleAddCalendar = (calendar: Calendar) => {
+    setPersonalCalendars((prev) => prev.concat([calendar]));
+  };
+
   useEffect(() => {
     getCalendarsRequest();
     getInvitationsRequest();
@@ -64,10 +56,14 @@ export const MainMenu = () => {
             <h2 className="font-mono text-left mb-2 text-lg">
               Personal Calendars
             </h2>
-            <CalendarList
-              calendars={personalCalendars}
-              onDelete={handleDeleteCalendar}
-            ></CalendarList>
+            <CalendarListContext.Provider
+              value={{
+                contextCalendars: personalCalendars,
+                contextDeleteCalendar: handleDeleteCalendar,
+              }}
+            >
+              <CalendarList />
+            </CalendarListContext.Provider>
             <div className="flex flex-col mt-2 sm:flex-row gap-2">
               <PopoverTrigger asChild>
                 <Button
@@ -80,11 +76,11 @@ export const MainMenu = () => {
                 </Button>
               </PopoverTrigger>
               <PopoverContent
-                side={side}
+                side="bottom"
                 align="start"
                 className="flex w-80 border-black"
               >
-                <CreateCalendarCard />
+                <CreateCalendarCard addCalendar={handleAddCalendar} />
               </PopoverContent>
               <Button
                 variant={"outline"}
@@ -103,10 +99,14 @@ export const MainMenu = () => {
             <h2 className="font-mono text-left mb-2 text-lg">
               Group Calendars
             </h2>
-            <CalendarList
-              calendars={groupCalendars}
-              onDelete={handleDeleteCalendar}
-            ></CalendarList>
+            <CalendarListContext.Provider
+              value={{
+                contextCalendars: groupCalendars,
+                contextDeleteCalendar: handleDeleteCalendar,
+              }}
+            >
+              <CalendarList />
+            </CalendarListContext.Provider>
             <Button
               variant={"outline"}
               className="border-double border-4  border-gray-500
@@ -120,7 +120,7 @@ export const MainMenu = () => {
             <h2 className="font-mono text-left mb-2 text-lg">
               Group calendar Invitations
             </h2>
-            <InvitationsList invitations={invitations}></InvitationsList>
+            <InvitationsList invitations={invitations} />
           </div>
         </div>
       </div>

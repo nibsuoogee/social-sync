@@ -22,9 +22,7 @@ export const eventService = {
   },
   getEvents: async (calendar_id: number) => {
     return handleApiRequest<Event[]>(() =>
-      axios.get(`${BACKEND_URL}/events/`, {
-        params: { calendar_id },
-      })
+      axios.get(`${BACKEND_URL}/events/${calendar_id}`)
     );
   },
   patchEvent: async (body: EventModelBody) => {
@@ -34,9 +32,7 @@ export const eventService = {
   },
   deleteEvent: async (event_id: number) => {
     return handleApiRequest<string>(() =>
-      axios.delete(`${BACKEND_URL}/event/`, {
-        params: { event_id },
-      })
+      axios.delete(`${BACKEND_URL}/event/${event_id}`)
     );
   },
 };
