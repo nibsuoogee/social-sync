@@ -1,13 +1,38 @@
 import { CalendarComponent } from "@/components/CalendarComponent";
+import { useEventsContext } from "@/contexts/EventsContext";
 import { calendarService } from "@/services/calendar";
-import { Calendar, Event } from "@types";
+import { UserGroupIcon, UserIcon } from "@heroicons/react/24/outline";
+import { Calendar } from "@types";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+const calendarTitle = (calendar: Calendar) => (
+  <div className="flex items-center justify-start my-4 border-black gap-2">
+    {calendar.is_group ? (
+      <>
+        <h3 className="font-mono">Group calendar: </h3>
+
+        <UserGroupIcon
+          className="size-6 ml-4"
+          style={{ color: calendar.color }}
+        />
+      </>
+    ) : (
+      <>
+        <h3 className="font-mono">Personal calendar: </h3>
+        <UserIcon className="size-6 ml-2" style={{ color: calendar.color }} />
+      </>
+    )}
+    <h3 className="font-mono">{calendar.name}</h3>
+  </div>
+);
+
 export const CalendarPage = () => {
   const { calendar_id } = useParams();
+  const { contextHandleSetEvents, contextHandleSetCalendar } =
+    useEventsContext();
   const [calendar, setCalendar] = useState<Calendar | undefined>(undefined);
-  const [events, setEvents] = useState<Event[]>([]);
+  //const [events, setEvents] = useState<Event[]>([]);
 
   const getEvents = async () => {
     if (typeof calendar_id === "undefined") return;
@@ -16,7 +41,9 @@ export const CalendarPage = () => {
     if (!result) return;
 
     setCalendar(result.calendar);
-    setEvents(result.events);
+    //setEvents(result.events);
+    contextHandleSetCalendar(result.calendar);
+    contextHandleSetEvents(result.events);
   };
 
   useEffect(() => {
@@ -25,24 +52,10 @@ export const CalendarPage = () => {
 
   if (!calendar) return <div>loading...</div>;
 
-  const calendarHeader = `${
-    calendar.is_group ? "Group calendar" : "Personal calendar"
-  }: ${calendar.name}`;
-
   return (
-    <div>
-      <h1>{calendarHeader}</h1>
-      {events.length > 0
-        ? events.map((e, index) => (
-            <div key={index}>
-              {Object.values(e).map((v) => `${v} `)}
-              <br />
-            </div>
-          ))
-        : null}
-      <div className="flex flex-col items-center">
-        <CalendarComponent />
-      </div>
+    <div className="flex flex-col items-center">
+      {calendarTitle(calendar)}
+      <CalendarComponent />
     </div>
   );
 };

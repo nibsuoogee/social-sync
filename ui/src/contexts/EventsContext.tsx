@@ -1,7 +1,9 @@
-import { Event } from "@types";
+import { Calendar, Event } from "@types";
 import { createContext, ReactNode, useContext, useState } from "react";
 
 type EventsContextType = {
+  contextCalendar: Calendar | undefined;
+  contextHandleSetCalendar: (events: Calendar) => void;
   contextEvents: Event[];
   contextHandleSetEvents: (events: Event[]) => void;
 };
@@ -16,13 +18,26 @@ export const useEventsContext = () => {
 };
 
 export const EventsProvider = ({ children }: { children: ReactNode }) => {
+  const [contextCalendar, contextSetCalendar] = useState<Calendar | undefined>(
+    undefined
+  );
   const [contextEvents, contextSetEvents] = useState<Event[]>([]);
 
+  const contextHandleSetCalendar = (calendar: Calendar) => {
+    contextSetCalendar(calendar);
+  };
   const contextHandleSetEvents = (events: Event[]) => {
     contextSetEvents(events);
   };
   return (
-    <EventsContext.Provider value={{ contextEvents, contextHandleSetEvents }}>
+    <EventsContext.Provider
+      value={{
+        contextEvents,
+        contextHandleSetEvents,
+        contextCalendar,
+        contextHandleSetCalendar,
+      }}
+    >
       {children}
     </EventsContext.Provider>
   );
