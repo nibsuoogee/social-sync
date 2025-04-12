@@ -20,11 +20,6 @@ export const eventService = {
       axios.post(`${BACKEND_URL}/event/`, body)
     );
   },
-  getEvents: async (calendar_id: number) => {
-    return handleApiRequest<Event[]>(() =>
-      axios.get(`${BACKEND_URL}/events/${calendar_id}`)
-    );
-  },
   patchEvent: async (body: EventModelBody) => {
     return handleApiRequest<Event>(() =>
       axios.patch(`${BACKEND_URL}/event/`, body)
