@@ -57,6 +57,39 @@ export const CalendarDTO = {
       WHERE id = ${calendar_id} AND owner_user_id = ${owner_user_id})`;
     return result;
   },
+  findByOwnerAndUrl: async (
+    ownerUserId: number,
+    externalSourceUrl: string
+  ): Promise<Calendar | null> => {
+    const [calendar] = await sql`
+      SELECT * FROM calendars
+      WHERE owner_user_id = ${ownerUserId} AND external_source_url = ${externalSourceUrl}
+      LIMIT 1
+    `;
+    return calendar || null;
+  },
+  findAllWithExternalSource: async (ownerUserId: number): Promise<Calendar[]> => {
+    const calendars = await sql`
+      SELECT * FROM calendars
+      WHERE owner_user_id = ${ownerUserId} AND external_source_url IS NOT NULL
+    `;
+    return calendars;
+  },
+  findByCalendarId: async (calendarId: number): Promise<Event[]> => {
+    const events = await sql`
+      SELECT e.id, e.ics_uid FROM events e
+      JOIN events_calendars ec ON ec.events_id = e.id
+      WHERE ec.calendars_id = ${calendarId}
+    `;
+    return events;
+  },
+  updateLastSync: async (calendarId: number, date: Date): Promise<void> => {
+    await sql`
+      UPDATE calendars
+      SET external_last_sync = ${date}
+      WHERE id = ${calendarId}
+    `;
+  },
 };
 
 export const calendarModel = t.Object({
@@ -91,6 +124,17 @@ export const calendarModelForCreation = t.Object({
   color: t.String(),
   external_source_name: t.Optional(t.Union([t.String(), t.Null()])),
   external_source_url: t.Optional(t.Union([t.String(), t.Null()])),
+  external_last_sync: t.Optional(t.Union([t.Date(), t.Null()])),
+  external_sync_status: t.Optional(
+    t.Union([
+      t.Enum({
+        inactive: "inactive",
+        active: "active",
+        failed: "failed",
+      }),
+      t.Null(),
+    ])
+  ),
 });
 export type CalendarModelForCreation = typeof calendarModelForCreation.static;
 
