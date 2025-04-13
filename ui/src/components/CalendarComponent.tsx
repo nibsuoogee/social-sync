@@ -10,13 +10,14 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 const MAX_VISIBLE_EVENTS = 3;
 
 const CustomDayCell = (props: DayProps) => {
-  const { contextEvents, contextCalendar } = useEventsContext();
+  const { contextCalendarsAndEvents } = useEventsContext();
   const [firstVisibleEvent, setFirstVisibleEvent] = useState<
     number | undefined
   >();
   const buttonRef = useRef<HTMLButtonElement>(
     null
   ) as RefObject<HTMLButtonElement>;
+  const userCanAddEvents = contextCalendarsAndEvents.length === 1;
 
   const { isHidden, isButton, /*buttonProps,*/ divProps } = useDayRender(
     props.date,
@@ -25,43 +26,55 @@ const CustomDayCell = (props: DayProps) => {
   );
 
   // day content
-  const eventsOfDay = contextEvents.filter((e) => {
-    const eventDate = new Date(e.start_time); // ISO string -> Date object
+  const calendarsAndEventsFiltered = contextCalendarsAndEvents.map((ccae) => {
+    const filteredEvents = ccae.events.filter((e) => {
+      const eventDate = new Date(e.start_time); // ISO string -> Date object
 
-    if (isSameDate(eventDate, props.date)) return true;
+      if (isSameDate(eventDate, props.date)) return true;
 
-    return false;
+      return false;
+    });
+
+    return { calendar: ccae.calendar, events: filteredEvents };
   });
 
+  // Add all events from all calendars as eventblocks to array
+  // and then take a slice
+
+  const allEventBlocksFiltered = calendarsAndEventsFiltered.flatMap(
+    (filtered, index) => {
+      const { calendar, events } = filtered;
+      return events.map((event, eventIndex) => {
+        return (
+          <div key={`${index}-${eventIndex}`}>
+            <EventBlock
+              bgColor={calendar.color}
+              title={event.title}
+              startTime={event.start_time}
+              endTime={event.end_time}
+              customClass="min-h-6 max-h-10 h-min"
+              allDay={event.all_day}
+            />
+          </div>
+        );
+      });
+    }
+  );
+
   useEffect(() => {
-    setFirstVisibleEvent(eventsOfDay.length > 0 ? 0 : undefined);
+    setFirstVisibleEvent(allEventBlocksFiltered.length > 0 ? 0 : undefined);
   }, []);
 
   // Don't render if hidden (e.g., days from other months and showOutsideDays is false)
   if (isHidden) return <div {...divProps} />;
 
-  let eventBlocks: JSX.Element[] = [];
+  let visibleEvents: JSX.Element[] = [];
 
   if (typeof firstVisibleEvent !== "undefined") {
-    const visibleEvents = eventsOfDay.slice(
+    visibleEvents = allEventBlocksFiltered.slice(
       firstVisibleEvent,
       firstVisibleEvent + MAX_VISIBLE_EVENTS
     );
-
-    eventBlocks = visibleEvents.map((event, index) => {
-      if (!contextCalendar) return <div key={index}></div>;
-      return (
-        <div key={index}>
-          <EventBlock
-            bgColor={contextCalendar.color}
-            title={event.title}
-            startTime={event.start_time}
-            endTime={event.end_time}
-            customClass="min-h-6 max-h-10 h-min"
-          />
-        </div>
-      );
-    });
   }
 
   function nextPage() {
@@ -81,7 +94,9 @@ const CustomDayCell = (props: DayProps) => {
   const disableNextPage = () => {
     if (typeof firstVisibleEvent === "undefined") return true;
 
-    return firstVisibleEvent + MAX_VISIBLE_EVENTS > eventsOfDay.length;
+    return (
+      firstVisibleEvent + MAX_VISIBLE_EVENTS > allEventBlocksFiltered.length
+    );
   };
 
   const disablePreviousPage = () => {
@@ -99,7 +114,8 @@ const CustomDayCell = (props: DayProps) => {
           {...buttonProps}
           className="h-10 w-10 rounded hover:bg-accent text-sm"
         ></button> */}
-        {typeof firstVisibleEvent !== "undefined" ? (
+        {typeof firstVisibleEvent !== "undefined" &&
+        allEventBlocksFiltered.length > MAX_VISIBLE_EVENTS ? (
           <div className="flex items-center justify-between">
             <Button
               onClick={previousPage}
@@ -125,13 +141,18 @@ const CustomDayCell = (props: DayProps) => {
           <> {props.date.getDate()}</>
         )}
 
-        {eventBlocks}
-        <EventBlock
-          bgColor="transparent"
-          borderColor={contextCalendar?.color ?? "#cccccc"}
-          title=""
-          customClass="h-4 border border-dashed border-3 bg-opacity-0 opacity-0 hover:opacity-100"
-        />
+        {visibleEvents}
+
+        {userCanAddEvents ? (
+          <EventBlock
+            bgColor="transparent"
+            borderColor={
+              contextCalendarsAndEvents[0]?.calendar?.color ?? "#cccccc"
+            }
+            title=""
+            customClass="h-4 border border-dashed border-3 bg-opacity-0 opacity-0 hover:opacity-100"
+          />
+        ) : null}
       </div>
     );
   }

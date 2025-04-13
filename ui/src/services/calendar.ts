@@ -9,14 +9,11 @@ import {
   Membership,
 } from "@types";
 
+export type CalendarAndEvents = { calendar: Calendar; events: Event[] };
+
 interface PostCalendarResponse {
   calendar: Calendar;
   membership: Membership;
-}
-
-interface GetCalendarResponse {
-  calendar: Calendar;
-  events: Event[];
 }
 
 export const calendarService = {
@@ -30,8 +27,13 @@ export const calendarService = {
       axios.get(`${BACKEND_URL}/calendars/`)
     );
   },
+  getAllPersonalCalendars: async () => {
+    return handleApiRequest<CalendarAndEvents[]>(() =>
+      axios.get(`${BACKEND_URL}/calendar/all`)
+    );
+  },
   getCalendar: async (calendar_id: string) => {
-    return handleApiRequest<GetCalendarResponse>(() =>
+    return handleApiRequest<CalendarAndEvents>(() =>
       axios.get(`${BACKEND_URL}/calendar/${calendar_id}`)
     );
   },
