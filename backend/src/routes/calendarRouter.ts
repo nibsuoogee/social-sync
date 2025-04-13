@@ -4,7 +4,6 @@ import { authorizationMiddleware } from "../middleware/authorization";
 import {
   CalendarDTO,
   CalendarModelForCreation,
-  CalendarModelForUpdate,
   calendarCreateBody,
   calendarModel,
   calendarUpdateBody,
@@ -16,6 +15,7 @@ import {
 } from "src/models/membershipModel";
 import { getRandomColor } from "@shared/src/util/random";
 import { tryCatch } from "@shared/src/tryCatch";
+import { EventDTO, eventModel } from "src/models/eventsModel";
 
 export const calendarRouter = new Elysia()
   .use(jwtConfig)
@@ -85,6 +85,45 @@ export const calendarRouter = new Elysia()
           {
             response: {
               200: t.Array(calendarModel),
+              500: t.String(),
+            },
+          }
+        )
+        .get(
+          "/calendar/:id",
+          async ({ params, user, error }) => {
+            // 1) check if the user has a membership in the calendar
+            const [hasMembership, errMembership] = await tryCatch(
+              MembershipDTO.hasMembership(params.id, user.id)
+            );
+            if (errMembership) return error(500, errMembership.message);
+            if (!hasMembership)
+              return error(401, "No authorized access to calendar");
+
+            // 2) get the calendar
+            const [calendar, errCalendar] = await tryCatch(
+              CalendarDTO.getCalendar(params.id)
+            );
+            if (errCalendar) return error(500, errCalendar.message);
+            if (!calendar) return error(500, "Failed to get calendar");
+
+            // 3) get all events in the calendar
+            const [events, errEvents] = await tryCatch(
+              EventDTO.getEvents(params.id)
+            );
+            if (errEvents) return error(500, errEvents.message);
+            if (!events) return error(500, "Failed to get events");
+
+            return { calendar, events };
+          },
+          {
+            params: t.Object({ id: t.Integer() }),
+            response: {
+              200: t.Object({
+                calendar: calendarModel,
+                events: t.Array(eventModel),
+              }),
+              401: t.String(),
               500: t.String(),
             },
           }

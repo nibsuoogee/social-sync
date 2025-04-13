@@ -52,3 +52,8 @@ export const userModel = t.Object({
   created_at: t.Date(),
 });
 export type User = typeof userModel.static;
+
+export const accessToken = t.Object({
+  access_token: t.String(),
+});
+export type AccessToken = typeof accessToken.static;

@@ -8,6 +8,15 @@ COPY ui/. .
 
 # Copy shared code into a subfolder inside the image
 COPY shared/src ../shared/src
+COPY shared/tsconfig.json ../shared/tsconfig.json
+
+# Copy backend model types
+COPY backend/src/models ../backend/src/models
+COPY backend/tsconfig.json ../backend/tsconfig.json
+
+# Copy auth model types
+COPY auth/src/models ../auth/src/models
+COPY auth/tsconfig.json ../auth/tsconfig.json
 
 # Install nodemon globally
 RUN bun add -g nodemon

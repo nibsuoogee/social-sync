@@ -3,12 +3,16 @@ import axios from "axios";
 import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import { LoginForm } from "./components/LoginForm";
-import { RegisterForm } from "./components/RegisterForm";
-import { Frontpage } from "./components/Frontpage";
+import { Login } from "./pages/Login";
+import { Register } from "./pages/Register";
+import { Frontpage } from "./pages/Frontpage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { Dashboard } from "./components/Dashboard";
+import { MainMenu } from "./pages/MainMenu";
 import { AuthProvider } from "./contexts/AuthContext";
+import { PageShell } from "./components/PageShell";
+import { EventsProvider } from "@/contexts/EventsContext";
+import ProtectedLayout from "@/components/ProtectedLayout";
+import { CalendarPage } from "@/pages/CalendarPage";
 
 function App() {
   useEffect(() => {
@@ -41,19 +45,29 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Frontpage />} />
-          <Route path="/register" element={<RegisterForm />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          ></Route>
-        </Routes>
+        <PageShell>
+          <Routes>
+            {/* Public routes — no context */}
+            <Route path="/" element={<Frontpage />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+
+            {/* Protected route group */}
+            <Route
+              element={
+                <ProtectedRoute>
+                  {/* Event context provider */}
+                  <EventsProvider>
+                    <ProtectedLayout />
+                  </EventsProvider>
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/main-menu" element={<MainMenu />} />
+              <Route path="/calendar/:calendar_id" element={<CalendarPage />} />
+            </Route>
+          </Routes>
+        </PageShell>
       </AuthProvider>
     </Router>
   );

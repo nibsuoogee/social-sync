@@ -1,36 +1,34 @@
 import { Button, Input } from "@mui/joy";
-import axios from "axios";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { userService } from "@/services/user";
 
-export const LoginForm = () => {
+export const Login = () => {
+  const { login } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      // Send login request to the auth server
-      const response = await axios.post("https://auth.localhost/login", {
-        email,
-        password,
-      });
+    // Send login request to the auth server
+    const auth = await userService.postLogin({
+      email,
+      password,
+    });
+    if (!auth) return;
 
-      // Extract the access token from the response
-      const { access_token } = response.data;
+    // Extract the access token from the response
+    const { access_token } = auth;
 
-      // Update authentication state using the context
-      login(access_token);
+    // Update authentication state using the context
+    login(access_token);
 
-      // Redirect to the home page or dashboard
-      navigate("/dashboard");
-    } catch (err) {
-      console.error("Login error:", err);
-    }
+    // Redirect to the home page or dashboard
+    navigate("/main-menu");
   };
 
   const navigateToRegister = () => {
@@ -46,13 +44,13 @@ export const LoginForm = () => {
           type="email"
           onChange={(e) => setEmail(e.target.value)}
           required
-        ></Input>
+        />
         <Input
           placeholder="Password"
           type="password"
           onChange={(e) => setPassword(e.target.value)}
           required
-        ></Input>
+        />
         <Button type="submit">Login</Button>
       </form>
       <Button onClick={navigateToRegister}>Register</Button>
