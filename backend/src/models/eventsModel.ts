@@ -61,6 +61,28 @@ export const EventDTO = {
       AND user_read_only = false)`;
     return result;
   },
+  findByCalendarId: async (calendarId: number): Promise<Event[]> => {
+    const events = await sql`
+      SELECT e.id, e.ics_uid FROM events e
+      JOIN events_calendars ec ON ec.events_id = e.id
+      WHERE ec.calendars_id = ${calendarId}
+    `;
+    return events;
+  },
+  findByUidAndCalendar: async (
+    uid: string,
+    calendarId: number
+  ): Promise<Event | null> => {
+    const [event] = await sql`
+      SELECT id, title, description, location, start_time, end_time, timezone, all_day, recurrence_rule 
+      FROM events
+      WHERE ics_uid = ${uid} AND id IN (
+        SELECT events_id FROM events_calendars WHERE calendars_id = ${calendarId}
+      )
+      LIMIT 1
+    `;
+    return event || null;
+  },
 };
 
 export const eventModelForCreation = t.Object({
