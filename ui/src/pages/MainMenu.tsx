@@ -1,7 +1,7 @@
 import { CalendarList } from "@/components/CalendarList";
 import { useEffect, useState } from "react";
 import { Calendar, NewInvitationsResponse } from "@types";
-import { PlusIcon, ArrowDownIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, ArrowDownIcon, UserIcon } from "@heroicons/react/24/outline";
 import { InvitationsList } from "@/components/InvitationsList";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,8 +13,11 @@ import { CreateCalendarCard } from "@/components/CreateCalendarCard";
 import { calendarService } from "@/services/calendar";
 import { invitationService } from "@/services/invitation";
 import { CalendarListContext } from "@/contexts/CalendarListContext";
+import { useNavigate } from "react-router-dom";
 
 export const MainMenu = () => {
+  const navigate = useNavigate();
+
   const [personalCalendars, setPersonalCalendars] = useState<Calendar[]>([]);
   const [groupCalendars, setGroupCalendars] = useState<Calendar[]>([]);
   const [invitations, setInvitations] = useState<NewInvitationsResponse[]>([]);
@@ -43,6 +46,10 @@ export const MainMenu = () => {
     setPersonalCalendars((prev) => prev.concat([calendar]));
   };
 
+  const navigateAllCalendars = () => {
+    navigate("/calendar/all");
+  };
+
   useEffect(() => {
     getCalendarsRequest();
     getInvitationsRequest();
@@ -56,6 +63,15 @@ export const MainMenu = () => {
             <h2 className="font-mono text-left mb-2 text-lg">
               Personal Calendars
             </h2>
+            <Button
+              onClick={navigateAllCalendars}
+              variant={"outline"}
+              className="w-full flex items-center justify-start mb-2  border-black"
+            >
+              <UserIcon className="size-6 ml-2" style={{ color: "#000000" }} />
+
+              <h3 className="font-mono">All calendars</h3>
+            </Button>
             <CalendarListContext.Provider
               value={{
                 contextCalendars: personalCalendars,
