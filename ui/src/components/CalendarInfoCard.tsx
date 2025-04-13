@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { calendarService } from "@/services/calendar";
 import { useCalendarListContext } from "@/contexts/CalendarListContext";
 import { useNavigate } from "react-router-dom";
+import { membershipService } from "@/services/memberships";
 
 /**
  * This is shown when a user clicks on a calendar on the main menu.
@@ -16,6 +17,12 @@ export const CalendarInfoCard = ({ calendar }: { calendar: Calendar }) => {
     calendarService.deleteCalendar(calendar.id);
     // We could await a result, but UX is better if the calendar
     // is remove instantly without checking if the server agrees
+
+    contextDeleteCalendar(calendar.id);
+  };
+
+  const leaveGroupCalendar = async () => {
+    membershipService.deleteMembership(calendar.id);
 
     contextDeleteCalendar(calendar.id);
   };
@@ -39,7 +46,11 @@ export const CalendarInfoCard = ({ calendar }: { calendar: Calendar }) => {
       </h2>
       <div className="flex justify-end gap-2">
         {calendar.is_group ? (
-          <Button variant={"outline"} className="border-black w-20">
+          <Button
+            onClick={leaveGroupCalendar}
+            variant={"outline"}
+            className="border-black w-20"
+          >
             Leave
           </Button>
         ) : (

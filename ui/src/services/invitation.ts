@@ -2,6 +2,7 @@ import { BACKEND_URL } from "@/lib/constants";
 import { handleApiRequest } from "@/lib/requests";
 import axios from "axios";
 import {
+  Calendar,
   InvitationBody,
   InvitationUpdateBody,
   NewInvitationsResponse,
@@ -19,7 +20,7 @@ export const invitationService = {
     );
   },
   patchInvitation: async (body: InvitationUpdateBody) => {
-    return handleApiRequest<string>(() =>
+    return handleApiRequest<Calendar | string>(() =>
       axios.patch(`${BACKEND_URL}/invite/`, body)
     );
   },
