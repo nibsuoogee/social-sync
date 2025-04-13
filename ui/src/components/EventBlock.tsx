@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { isoDateToHoursMinutes } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 
 /**
@@ -11,12 +12,19 @@ export const EventBlock = ({
   borderColor = "transparent",
   title,
   customClass,
+  startTime,
+  endTime,
 }: {
   bgColor: string;
   borderColor?: string;
   title: string;
   customClass?: string;
+  startTime?: Date;
+  endTime?: Date;
 }) => {
+  const startTimeText = startTime ? isoDateToHoursMinutes(startTime) : "";
+  const endTimeText = endTime ? isoDateToHoursMinutes(endTime) : "";
+
   return (
     <>
       <Button
@@ -28,10 +36,18 @@ export const EventBlock = ({
         }}
         className={cn(
           customClass,
-          "justify-start p-1 m-0 h-4 rounded-sm w-full hover:brightness-90"
+          "text-xs line-clamp-2 truncate whitespace-normal items-start text-left justify-start px-1 m-0 rounded-sm w-full hover:brightness-90"
         )}
       >
-        {title}
+        <div className="flex flex-row justify-start gap-1">
+          <div className="flex flex-col justify-start">
+            <div>{startTimeText}-</div>
+            <div>{endTimeText}</div>
+          </div>
+          <div className="line-clamp-2 overflow-hidden text-ellipsis w-full">
+            {title}
+          </div>
+        </div>
       </Button>
     </>
   );
