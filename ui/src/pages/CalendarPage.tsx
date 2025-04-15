@@ -1,4 +1,4 @@
-import { CalendarComponent } from "@/components/CalendarComponent";
+import { CalendarComponent } from "@/components/calendar/CalendarComponent";
 import { useEventsContext } from "@/contexts/EventsContext";
 import { calendarService } from "@/services/calendar";
 import { UserGroupIcon, UserIcon } from "@heroicons/react/24/outline";

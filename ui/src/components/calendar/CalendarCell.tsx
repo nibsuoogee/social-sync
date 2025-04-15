@@ -1,23 +1,27 @@
 import { JSX, RefObject, useEffect, useRef, useState } from "react";
-import { Calendar } from "@/components/ui/calendar";
 import { DayProps, useDayRender } from "react-day-picker";
 import { useEventsContext } from "@/contexts/EventsContext";
-import { EventBlock } from "@/components/EventBlock";
+import { EventBlock } from "@/components/calendar/EventBlock";
 import { isSameDate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const MAX_VISIBLE_EVENTS = 3;
 
-const CustomDayCell = (props: DayProps) => {
+/**
+ * Fills a calendar's cell, and provides features such opening a window to
+ * create an event when the user clicks inside it.
+ */
+export const CalendarCell = (props: DayProps) => {
   const { contextCalendarsAndEvents } = useEventsContext();
   const [firstVisibleEvent, setFirstVisibleEvent] = useState<
     number | undefined
   >();
+  const noEventsInCell = typeof firstVisibleEvent === "undefined";
   const buttonRef = useRef<HTMLButtonElement>(
     null
   ) as RefObject<HTMLButtonElement>;
-  const userCanAddEvents = contextCalendarsAndEvents.length === 1;
+  const isSingleCalendar = contextCalendarsAndEvents.length === 1;
 
   const { isHidden, isButton, /*buttonProps,*/ divProps } = useDayRender(
     props.date,
@@ -48,6 +52,7 @@ const CustomDayCell = (props: DayProps) => {
         return (
           <div key={`${index}-${eventIndex}`}>
             <EventBlock
+              onClickFunc={() => null}
               bgColor={calendar.color}
               title={event.title}
               startTime={event.start_time}
@@ -70,7 +75,7 @@ const CustomDayCell = (props: DayProps) => {
 
   let visibleEvents: JSX.Element[] = [];
 
-  if (typeof firstVisibleEvent !== "undefined") {
+  if (!noEventsInCell) {
     visibleEvents = allEventBlocksFiltered.slice(
       firstVisibleEvent,
       firstVisibleEvent + MAX_VISIBLE_EVENTS
@@ -92,18 +97,28 @@ const CustomDayCell = (props: DayProps) => {
   }
 
   const disableNextPage = () => {
-    if (typeof firstVisibleEvent === "undefined") return true;
+    if (noEventsInCell) return true;
 
     return (
-      firstVisibleEvent + MAX_VISIBLE_EVENTS > allEventBlocksFiltered.length
+      firstVisibleEvent + MAX_VISIBLE_EVENTS > allEventBlocksFiltered.length - 1
     );
   };
 
   const disablePreviousPage = () => {
-    if (typeof firstVisibleEvent === "undefined") return true;
+    if (noEventsInCell) return true;
 
     return firstVisibleEvent - MAX_VISIBLE_EVENTS < 0;
   };
+
+  const showingMaxEvents = visibleEvents.length === MAX_VISIBLE_EVENTS;
+
+  const canAddEvent = isSingleCalendar
+    ? noEventsInCell
+      ? true
+      : showingMaxEvents
+      ? false
+      : true
+    : false;
 
   // If it's a button day (clickable/selectable)
   if (isButton) {
@@ -114,7 +129,7 @@ const CustomDayCell = (props: DayProps) => {
           {...buttonProps}
           className="h-10 w-10 rounded hover:bg-accent text-sm"
         ></button> */}
-        {typeof firstVisibleEvent !== "undefined" &&
+        {!noEventsInCell &&
         allEventBlocksFiltered.length > MAX_VISIBLE_EVENTS ? (
           <div className="flex items-center justify-between">
             <Button
@@ -122,7 +137,7 @@ const CustomDayCell = (props: DayProps) => {
               variant="ghost"
               size="icon"
               className="h-4 w-4"
-              disabled={disablePreviousPage() ?? false}
+              disabled={disablePreviousPage()}
             >
               <ChevronLeft />
             </Button>
@@ -132,7 +147,7 @@ const CustomDayCell = (props: DayProps) => {
               variant="ghost"
               size="icon"
               className="h-4 w-4"
-              disabled={disableNextPage() ?? false}
+              disabled={disableNextPage()}
             >
               <ChevronRight />
             </Button>
@@ -143,8 +158,9 @@ const CustomDayCell = (props: DayProps) => {
 
         {visibleEvents}
 
-        {userCanAddEvents ? (
+        {canAddEvent ? (
           <EventBlock
+            onClickFunc={() => null}
             bgColor="transparent"
             borderColor={
               contextCalendarsAndEvents[0]?.calendar?.color ?? "#cccccc"
@@ -162,22 +178,5 @@ const CustomDayCell = (props: DayProps) => {
     <div {...divProps} className="h-10 w-10 text-muted-foreground text-sm">
       {props.date.getDate()}
     </div>
-  );
-};
-
-/**
- * The main calendar component in the calendar view.
- */
-export const CalendarComponent = () => {
-  const [date, setDate] = useState<Date | undefined>(new Date());
-
-  return (
-    <Calendar
-      mode="single"
-      selected={date}
-      onSelect={setDate}
-      className="rounded-md border"
-      components={{ Day: CustomDayCell }}
-    />
   );
 };
