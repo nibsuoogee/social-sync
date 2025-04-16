@@ -31,8 +31,10 @@ const calendarFormSchema = z.object({
 });
 
 export const CreateCalendarCard = ({
+  isGroup,
   addCalendar,
 }: {
+  isGroup: boolean;
   addCalendar: (calendar: Calendar) => void;
 }) => {
   // 1. defining form
@@ -50,7 +52,7 @@ export const CreateCalendarCard = ({
     const result = await calendarService.postCalendar({
       name: values.title,
       description: values.description,
-      is_group: false,
+      is_group: isGroup,
       color: values.color,
     });
     if (!result) return;
@@ -59,9 +61,16 @@ export const CreateCalendarCard = ({
 
   return (
     <div className="flex flex-col border-black">
-      <h2 className="font-mono font-bold text-sm text-left mb-2">
-        Create New Calendar
-      </h2>
+      {isGroup ? (
+        <h2 className="font-mono font-bold text-sm text-left mb-2">
+          Create New Group Calendar
+        </h2>
+      ) : (
+        <h2 className="font-mono font-bold text-sm text-left mb-2">
+          Create New Personal Calendar
+        </h2>
+      )}
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField

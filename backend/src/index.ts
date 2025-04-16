@@ -7,6 +7,7 @@ import { calendarRouter } from "src/routes/calendarRouter";
 import { eventRouter } from "./routes/eventRouter";
 import { calendarUrlImportRouter } from "./routes/importCalendarRouter";
 import { syncCalendarRouter } from "./routes/syncCalendarRouter";
+import { membershipsRouter } from "./routes/membershipsRouter";
 
 const app = new Elysia()
   .use(swagger())
@@ -18,6 +19,7 @@ const app = new Elysia()
   .use(eventRouter)
   .use(calendarUrlImportRouter)
   .use(syncCalendarRouter)
+  .use(membershipsRouter)
   .listen(3000);
 
 console.log(
