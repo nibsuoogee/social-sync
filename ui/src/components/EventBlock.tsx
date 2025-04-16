@@ -14,6 +14,7 @@ export const EventBlock = ({
   customClass,
   startTime,
   endTime,
+  allDay,
 }: {
   bgColor: string;
   borderColor?: string;
@@ -21,9 +22,18 @@ export const EventBlock = ({
   customClass?: string;
   startTime?: Date;
   endTime?: Date;
+  allDay?: boolean;
 }) => {
-  const startTimeText = startTime ? isoDateToHoursMinutes(startTime) : "";
-  const endTimeText = endTime ? isoDateToHoursMinutes(endTime) : "";
+  const startTimeText = allDay
+    ? "All"
+    : startTime
+    ? isoDateToHoursMinutes(startTime)
+    : "";
+  const endTimeText = allDay
+    ? "day"
+    : endTime
+    ? isoDateToHoursMinutes(endTime)
+    : "";
 
   return (
     <>
@@ -39,7 +49,7 @@ export const EventBlock = ({
           "text-xs line-clamp-2 truncate whitespace-normal items-start text-left justify-start px-1 m-0 rounded-sm w-full hover:brightness-90"
         )}
       >
-        <div className="flex flex-row justify-start gap-1">
+        <div className="grid grid-cols-[25%_75%] divide-x-1 divide-solid divide-gray-200 gap-1">
           <div className="flex flex-col justify-start">
             <div>{startTimeText}-</div>
             <div>{endTimeText}</div>

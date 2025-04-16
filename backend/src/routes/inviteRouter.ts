@@ -12,7 +12,7 @@ import {
   MembershipDTO,
   MembershipModelForCreation,
 } from "../models/membershipModel";
-import { CalendarDTO } from "src/models/calendarModel";
+import { CalendarDTO, calendarModel } from "src/models/calendarModel";
 import { tryCatch } from "@shared/src/tryCatch";
 
 export const inviteRouter = new Elysia()
@@ -126,12 +126,18 @@ export const inviteRouter = new Elysia()
             if (errMembership) return error(500, errMembership.message);
             if (!newMembership) return error(500, "Internal Server Error");
 
-            return "Success";
+            const [calendar, errCalendar] = await tryCatch(
+              CalendarDTO.getCalendar(updatedInvitation.calendar_id)
+            );
+            if (errCalendar) return error(500, errCalendar.message);
+            if (!calendar) return error(500, "Failed to get calendar");
+
+            return calendar;
           },
           {
             body: invitationUpdateBody,
             response: {
-              200: t.String(),
+              200: t.Union([calendarModel, t.String()]),
               500: t.String(),
             },
           }
