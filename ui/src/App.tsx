@@ -65,6 +65,10 @@ function App() {
             >
               <Route path="/main-menu" element={<MainMenu />} />
               <Route path="/calendar/:calendar_id" element={<CalendarPage />} />
+              <Route
+                path="/calendar/all"
+                element={<CalendarPage allPersonalCalendars />}
+              />
             </Route>
           </Routes>
         </PageShell>

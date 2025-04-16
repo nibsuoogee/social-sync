@@ -2,6 +2,7 @@ import Elysia, { t } from "elysia";
 import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
 import {
+  Calendar,
   CalendarDTO,
   CalendarModelForCreation,
   calendarCreateBody,
@@ -15,7 +16,7 @@ import {
 } from "src/models/membershipModel";
 import { getRandomColor } from "@shared/src/util/random";
 import { tryCatch } from "@shared/src/tryCatch";
-import { EventDTO, eventModel } from "src/models/eventsModel";
+import { Event, EventDTO, eventModel } from "src/models/eventsModel";
 
 export const calendarRouter = new Elysia()
   .use(jwtConfig)
@@ -123,6 +124,56 @@ export const calendarRouter = new Elysia()
                 calendar: calendarModel,
                 events: t.Array(eventModel),
               }),
+              401: t.String(),
+              500: t.String(),
+            },
+          }
+        )
+        .get(
+          "/calendar/all",
+          async ({ user, error }) => {
+            // 1) get the user's calendars
+            const [calendars, errCalendars] = await tryCatch(
+              CalendarDTO.getPersonalCalendars(user.id)
+            );
+            if (errCalendars) return error(500, errCalendars.message);
+            if (!calendars) return error(500, "Failed to get calendars");
+
+            // 2) get events for all calendars
+            const eventPromises = calendars.map(async (calendar) => {
+              const [events, errEvents] = await tryCatch(
+                EventDTO.getEvents(calendar.id)
+              );
+              return { calendar, events, errEvents };
+            });
+            const eventResults = await Promise.all(eventPromises);
+
+            // 3) Check for errors
+            for (const result of eventResults) {
+              const { events, errEvents } = result;
+              if (errEvents) return error(500, errEvents.message);
+              if (!events) return error(500, "Failed to get events");
+            }
+
+            // 4) construct the result array
+            const results = eventResults.map(({ calendar, events }) => ({
+              calendar,
+              events,
+            })) as {
+              calendar: Calendar;
+              events: Event[];
+            }[];
+
+            return results;
+          },
+          {
+            response: {
+              200: t.Array(
+                t.Object({
+                  calendar: calendarModel,
+                  events: t.Array(eventModel),
+                })
+              ),
               401: t.String(),
               500: t.String(),
             },

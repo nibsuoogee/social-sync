@@ -29,6 +29,14 @@ export const CalendarDTO = {
     `;
     return calendar;
   },
+  getPersonalCalendars: async (user_id: number): Promise<Calendar[]> => {
+    const calendars = await sql`
+      SELECT * FROM calendars
+      WHERE owner_user_id = ${user_id}
+      AND is_group = false
+    `;
+    return [...calendars];
+  },
   updateCalendar: async (
     calendar_id: number,
     calendar: CalendarModelForUpdate
@@ -68,7 +76,9 @@ export const CalendarDTO = {
     `;
     return calendar || null;
   },
-  findAllWithExternalSource: async (ownerUserId: number): Promise<Calendar[]> => {
+  findAllWithExternalSource: async (
+    ownerUserId: number
+  ): Promise<Calendar[]> => {
     const calendars = await sql`
       SELECT * FROM calendars
       WHERE owner_user_id = ${ownerUserId} AND external_source_url IS NOT NULL

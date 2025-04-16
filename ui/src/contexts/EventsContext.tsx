@@ -1,11 +1,9 @@
-import { Calendar, Event } from "@types";
+import { CalendarAndEvents } from "@/services/calendar";
 import { createContext, ReactNode, useContext, useState } from "react";
 
 type EventsContextType = {
-  contextCalendar: Calendar | undefined;
-  contextHandleSetCalendar: (events: Calendar) => void;
-  contextEvents: Event[];
-  contextHandleSetEvents: (events: Event[]) => void;
+  contextCalendarsAndEvents: CalendarAndEvents[];
+  contextHandleCalendarsAndEvents: (value: CalendarAndEvents[]) => void;
 };
 
 const EventsContext = createContext<EventsContextType | undefined>(undefined);
@@ -18,24 +16,18 @@ export const useEventsContext = () => {
 };
 
 export const EventsProvider = ({ children }: { children: ReactNode }) => {
-  const [contextCalendar, contextSetCalendar] = useState<Calendar | undefined>(
-    undefined
-  );
-  const [contextEvents, contextSetEvents] = useState<Event[]>([]);
+  const [contextCalendarsAndEvents, contextSetCalendarsAndEvents] = useState<
+    CalendarAndEvents[]
+  >([]);
 
-  const contextHandleSetCalendar = (calendar: Calendar) => {
-    contextSetCalendar(calendar);
-  };
-  const contextHandleSetEvents = (events: Event[]) => {
-    contextSetEvents(events);
+  const contextHandleCalendarsAndEvents = (value: CalendarAndEvents[]) => {
+    contextSetCalendarsAndEvents(value);
   };
   return (
     <EventsContext.Provider
       value={{
-        contextEvents,
-        contextHandleSetEvents,
-        contextCalendar,
-        contextHandleSetCalendar,
+        contextCalendarsAndEvents,
+        contextHandleCalendarsAndEvents,
       }}
     >
       {children}
