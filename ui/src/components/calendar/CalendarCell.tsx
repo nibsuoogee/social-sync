@@ -51,7 +51,15 @@ export const CalendarCell = (props: DayProps) => {
   const allEventBlocksFiltered = calendarsAndEventsFiltered.flatMap(
     (filtered) => {
       const { calendar, events } = filtered;
-      return events.map((event) => {
+      const sortedEvents = events.sort(function (a, b) {
+        if (a.all_day && !b.all_day) return -1;
+        if (!a.all_day && b.all_day) return 1;
+
+        return (
+          new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+        );
+      });
+      return sortedEvents.map((event) => {
         return (
           <div key={event.id}>
             <EventBlock
@@ -100,7 +108,7 @@ export const CalendarCell = (props: DayProps) => {
     if (noEventsInCell) return true;
 
     return (
-      firstVisibleEvent + MAX_VISIBLE_EVENTS > allEventBlocksFiltered.length - 1
+      firstVisibleEvent + MAX_VISIBLE_EVENTS > allEventBlocksFiltered.length
     );
   };
 
@@ -125,11 +133,16 @@ export const CalendarCell = (props: DayProps) => {
     if (typeof thisCalendarId !== "number") return;
 
     // 1) create a new empty event
+    const now = new Date();
     const newEventBody = deepCopy(defaultEventModelBody);
-    newEventBody.calendar_id = thisCalendarId;
-    newEventBody.start_time = date;
-    newEventBody.end_time = date;
 
+    newEventBody.calendar_id = thisCalendarId;
+    newEventBody.start_time = new Date(
+      date.setHours(now.getHours(), now.getMinutes())
+    );
+    newEventBody.end_time = new Date(
+      date.setHours(now.getHours(), now.getMinutes() + 30)
+    );
     // 2) send it to the server and wait for the full event
     const response = await eventService.postEvent(newEventBody);
     if (!response) return;
@@ -157,7 +170,7 @@ export const CalendarCell = (props: DayProps) => {
           className="h-10 w-10 rounded hover:bg-accent text-sm"
         ></button> */}
         {!noEventsInCell &&
-        allEventBlocksFiltered.length > MAX_VISIBLE_EVENTS ? (
+        allEventBlocksFiltered.length >= MAX_VISIBLE_EVENTS ? (
           <div className="flex items-center justify-between">
             <Button
               onClick={previousPage}

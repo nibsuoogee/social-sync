@@ -99,6 +99,7 @@ export const EventInfo = ({ event, calendarId }: EventInfoProps) => {
       icon: InformationCircleIcon,
       content: (
         <EditableField
+          className="text-lg"
           value={event.title}
           onSave={(value) => handleTemporaryEvent("title", value)}
           isEditing={isEditing}
@@ -123,15 +124,24 @@ export const EventInfo = ({ event, calendarId }: EventInfoProps) => {
           {isEditing ? (
             <>
               <TimePicker24h
-                inputDate={event.start_time}
-                handleDate={() => null}
+                inputDate={temporaryEvent?.start_time ?? event.start_time}
+                handleDate={(value) =>
+                  handleTemporaryEvent("start_time", value)
+                }
               />
               -
               <TimePicker24h
-                inputDate={event.end_time}
-                handleDate={() => null}
+                inputDate={temporaryEvent?.end_time ?? event.end_time}
+                handleDate={(value) => handleTemporaryEvent("end_time", value)}
               />
-              <Checkbox id="all-day" checked={event.all_day} className="ml-4" />
+              <Checkbox
+                id="all-day"
+                checked={temporaryEvent?.all_day ?? event.all_day}
+                onCheckedChange={(value) =>
+                  handleTemporaryEvent("all_day", value === true)
+                }
+                className="ml-4"
+              />
             </>
           ) : (
             <>

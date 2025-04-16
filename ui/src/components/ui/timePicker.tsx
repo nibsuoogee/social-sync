@@ -33,7 +33,7 @@ export function TimePicker24h({ inputDate, handleDate }: TimePicker24hProps) {
       } else if (type === "minute") {
         newDate.setMinutes(parseInt(value));
       }
-      handleDate(newDate);
+      handleDate(newDate.toISOString() as unknown as Date);
     }
   };
 

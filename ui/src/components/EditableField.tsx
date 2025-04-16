@@ -1,8 +1,10 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 type EditableFieldProps = {
+  className?: string;
   value: string;
   onSave: (val: string) => void;
   isEditing: boolean;
@@ -14,6 +16,7 @@ type EditableFieldProps = {
  * input element.
  */
 export const EditableField = ({
+  className,
   value,
   onSave,
   isEditing,
@@ -22,7 +25,7 @@ export const EditableField = ({
   const [input, setInput] = useState(value);
 
   return (
-    <div className="text-sm w-full">
+    <div className={cn("text-sm w-full", className)}>
       {isEditing ? (
         <>
           {isTextarea ? (
