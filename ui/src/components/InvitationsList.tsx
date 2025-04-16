@@ -1,19 +1,15 @@
 /**
  * List of invites shown in the main menu.
  */
-
-import { NewInvitationsResponse } from "@types";
+import { useInvitationListContext } from "@/contexts/InvitationListContext";
 import { InvitationListElement } from "./InvitationListElement";
 
-export const InvitationsList = ({
-  invitations,
-}: {
-  invitations: NewInvitationsResponse[];
-}) => {
+export const InvitationsList = () => {
+  const { contextInvitations } = useInvitationListContext();
   return (
     <div className="flex-1">
-      {invitations.length !== 0
-        ? invitations.map((invitation) => (
+      {contextInvitations.length !== 0
+        ? contextInvitations.map((invitation) => (
             <InvitationListElement
               key={invitation.id}
               invitation={invitation}

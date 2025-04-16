@@ -34,6 +34,17 @@ export const MembershipDTO = {
       AND user_id = ${user_id}`;
     return result.id;
   },
+  deleteMembership: async (
+    calendar_id: number,
+    user_id: number
+  ): Promise<Membership> => {
+    const [deletedMembership] = await sql`
+      DELETE FROM memberships
+      WHERE calendar_id = ${calendar_id}
+      AND user_id = ${user_id}
+      RETURNING *`;
+    return deletedMembership;
+  },
 };
 
 export const membershipModelForCreation = t.Object({
