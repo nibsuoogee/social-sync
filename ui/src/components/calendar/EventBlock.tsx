@@ -8,6 +8,15 @@ import {
 import { getTextColor } from "@/lib/color";
 import { isoDateToHoursMinutes } from "@/lib/dates";
 import { cn } from "@/lib/utils";
+import { Event } from "@types";
+
+type EventBlockProps = {
+  event: Event;
+  calendarId: number;
+  bgColor: string;
+  borderColor?: string;
+  customClass?: string;
+};
 
 /**
  * Event blocks populate calendar cells. They have a background colour,
@@ -15,33 +24,21 @@ import { cn } from "@/lib/utils";
  * dashed border.
  */
 export const EventBlock = ({
-  onClickFunc,
+  event,
+  calendarId,
   bgColor,
   borderColor = "transparent",
-  title,
   customClass,
-  startTime,
-  endTime,
-  allDay,
-}: {
-  onClickFunc: () => void;
-  bgColor: string;
-  borderColor?: string;
-  title: string;
-  customClass?: string;
-  startTime?: Date;
-  endTime?: Date;
-  allDay?: boolean;
-}) => {
-  const startTimeText = allDay
+}: EventBlockProps) => {
+  const startTimeText = event.all_day
     ? "All"
-    : startTime
-    ? isoDateToHoursMinutes(startTime)
+    : event.start_time
+    ? isoDateToHoursMinutes(event.start_time)
     : "";
-  const endTimeText = allDay
+  const endTimeText = event.all_day
     ? "day"
-    : endTime
-    ? isoDateToHoursMinutes(endTime)
+    : event.end_time
+    ? isoDateToHoursMinutes(event.end_time)
     : "";
   const textColor = getTextColor(bgColor);
 
@@ -50,7 +47,6 @@ export const EventBlock = ({
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            onClick={onClickFunc}
             size={"sm"}
             variant={"default"}
             style={{
@@ -66,7 +62,7 @@ export const EventBlock = ({
             <div
               className={cn(
                 bgColor === "transparent" ? "divide-none" : "divide-solid",
-                "grid grid-cols-[25%_75%] divide-x-1 gap-1",
+                "grid grid-cols-[28%_72%] divide-x-1 gap-1",
                 {
                   "divide-black": textColor === "black",
                   "divide-white": textColor === "white",
@@ -78,7 +74,7 @@ export const EventBlock = ({
                 <div>{endTimeText}</div>
               </div>
               <div className="line-clamp-2 overflow-hidden text-ellipsis w-full">
-                {title}
+                {event.title}
               </div>
             </div>
           </Button>
@@ -86,9 +82,9 @@ export const EventBlock = ({
         <PopoverContent
           side="right"
           align="start"
-          className="flex w-80 border-black"
+          className="flex w-100 border-black"
         >
-          <EventInfo />
+          <EventInfo event={event} calendarId={calendarId} />
         </PopoverContent>
       </Popover>
     </>

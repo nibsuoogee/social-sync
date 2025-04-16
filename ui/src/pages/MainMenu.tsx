@@ -1,7 +1,11 @@
 import { CalendarList } from "@/components/CalendarList";
 import { useEffect, useState } from "react";
 import { Calendar, NewInvitationsResponse } from "@types";
-import { PlusIcon, ArrowDownIcon, UserIcon } from "@heroicons/react/24/outline";
+import {
+  PlusIcon,
+  ArrowDownIcon,
+  CalendarDaysIcon,
+} from "@heroicons/react/24/outline";
 import { InvitationsList } from "@/components/InvitationsList";
 import { Button } from "@/components/ui/button";
 import {
@@ -68,9 +72,12 @@ export const MainMenu = () => {
               variant={"outline"}
               className="w-full flex items-center justify-start mb-2  border-black"
             >
-              <UserIcon className="size-6 ml-2" style={{ color: "#000000" }} />
+              <CalendarDaysIcon
+                className="size-6 ml-2"
+                style={{ color: "#000000" }}
+              />
 
-              <h3 className="font-mono">All calendars</h3>
+              <h3 className="font-mono">Show full personal calendar</h3>
             </Button>
             <CalendarListContext.Provider
               value={{

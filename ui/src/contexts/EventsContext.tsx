@@ -4,6 +4,9 @@ import { createContext, ReactNode, useContext, useState } from "react";
 type EventsContextType = {
   contextCalendarsAndEvents: CalendarAndEvents[];
   contextHandleCalendarsAndEvents: (value: CalendarAndEvents[]) => void;
+  contextSetCalendarsAndEvents: React.Dispatch<
+    React.SetStateAction<CalendarAndEvents[]>
+  >;
 };
 
 const EventsContext = createContext<EventsContextType | undefined>(undefined);
@@ -28,6 +31,7 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
       value={{
         contextCalendarsAndEvents,
         contextHandleCalendarsAndEvents,
+        contextSetCalendarsAndEvents,
       }}
     >
       {children}

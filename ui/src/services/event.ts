@@ -14,13 +14,15 @@ interface PostEventResponse {
   newAttendance: Attendance;
 }
 
+type EventPatchBody = { id: number } & Partial<Event>;
+
 export const eventService = {
   postEvent: async (body: EventModelBody) => {
     return handleApiRequest<PostEventResponse>(() =>
       axios.post(`${BACKEND_URL}/event/`, body)
     );
   },
-  patchEvent: async (body: EventModelBody) => {
+  patchEvent: async (body: EventPatchBody) => {
     return handleApiRequest<Event>(() =>
       axios.patch(`${BACKEND_URL}/event/`, body)
     );

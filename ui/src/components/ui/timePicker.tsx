@@ -11,9 +11,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ensureDate } from "@/lib/dates";
 
-export function TimePicker24h() {
-  const [date, setDate] = React.useState<Date>(new Date());
+type TimePicker24hProps = {
+  inputDate: Date;
+  handleDate: (value: Date) => void;
+};
+
+export function TimePicker24h({ inputDate, handleDate }: TimePicker24hProps) {
+  const date = ensureDate(inputDate);
+
   const [isOpen, setIsOpen] = React.useState(false);
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -26,7 +33,7 @@ export function TimePicker24h() {
       } else if (type === "minute") {
         newDate.setMinutes(parseInt(value));
       }
-      setDate(newDate);
+      handleDate(newDate);
     }
   };
 
