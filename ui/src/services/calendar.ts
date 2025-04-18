@@ -37,6 +37,11 @@ export const calendarService = {
       axios.get(`${BACKEND_URL}/calendar/${calendar_id}`)
     );
   },
+  getMemberCalendars: async (calendar_id: string) => {
+    return handleApiRequest<CalendarAndEvents[]>(() =>
+      axios.get(`${BACKEND_URL}/calendar/group/${calendar_id}`)
+    );
+  },
   patchCalendar: async (body: CalendarUpdateBody) => {
     return handleApiRequest<Calendar>(() =>
       axios.patch(`${BACKEND_URL}/calendar/`, body)

@@ -14,6 +14,7 @@ import {
 } from "../models/membershipModel";
 import { CalendarDTO, calendarModel } from "src/models/calendarModel";
 import { tryCatch } from "@shared/src/tryCatch";
+import { getRandomColor } from "@shared/src/util/random";
 
 export const inviteRouter = new Elysia()
   .use(jwtConfig)
@@ -118,7 +119,7 @@ export const inviteRouter = new Elysia()
               calendar_id: updatedInvitation.calendar_id,
               user_id: user.id,
               role: "member",
-              color: "#1A1A1A",
+              color: getRandomColor(),
             };
             const [newMembership, errMembership] = await tryCatch(
               MembershipDTO.createMembership(membership)

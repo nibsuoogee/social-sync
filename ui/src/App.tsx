@@ -64,10 +64,17 @@ function App() {
               }
             >
               <Route path="/main-menu" element={<MainMenu />} />
-              <Route path="/calendar/:calendar_id" element={<CalendarPage />} />
+              <Route
+                path="/calendar/:calendar_id"
+                element={<CalendarPage variant="single" />}
+              />
+              <Route
+                path="/calendar/group/:calendar_id"
+                element={<CalendarPage variant="group" />}
+              />
               <Route
                 path="/calendar/all"
-                element={<CalendarPage allPersonalCalendars />}
+                element={<CalendarPage variant="fullPersonal" />}
               />
             </Route>
           </Routes>

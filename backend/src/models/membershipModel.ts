@@ -34,6 +34,20 @@ export const MembershipDTO = {
       AND user_id = ${user_id}`;
     return result.id;
   },
+  getMembers: async (calendar_id: number): Promise<GroupMemberInfo[]> => {
+    const members = await sql`
+      SELECT users.username, users.email, memberships.*
+      FROM users
+      JOIN memberships ON users.id = memberships.user_id
+      WHERE memberships.calendar_id = ${calendar_id}`;
+    return [...members];
+  },
+  getMemberships: async (calendar_id: number): Promise<Membership[]> => {
+    const members = await sql`
+      SELECT * FROM memberships
+      WHERE calendar_id = ${calendar_id}`;
+    return [...members];
+  },
   deleteMembership: async (
     calendar_id: number,
     user_id: number
@@ -64,3 +78,14 @@ export const membershipModel = t.Object({
   color: t.String(),
 });
 export type Membership = typeof membershipModel.static;
+
+export const groupMemberInfo = t.Object({
+  username: t.String(),
+  email: t.String(),
+  id: t.Integer(),
+  calendar_id: t.Integer(),
+  user_id: t.Integer(),
+  role: t.Enum({ owner: "owner", member: "member" }),
+  color: t.String(),
+});
+export type GroupMemberInfo = typeof groupMemberInfo.static;

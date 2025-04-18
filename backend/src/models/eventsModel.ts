@@ -132,7 +132,7 @@ export type Event = typeof eventModel.static;
 
 export const eventModelBody = t.Object({
   calendar_id: t.Integer(),
-  ics_uid: t.String(),
+  ics_uid: t.Optional(t.String()),
   title: t.String(),
   description: t.String(),
   location: t.String(),

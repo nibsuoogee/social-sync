@@ -1,4 +1,4 @@
-import { Button } from "@mui/joy";
+import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useState } from "react";
 
@@ -7,7 +7,9 @@ export const SyncAllCalendarsButton = () => {
 
   const handleSyncAll = async () => {
     try {
-      const response = await axios.post("https://backend.localhost/calendar/sync-all");
+      const response = await axios.post(
+        "https://backend.localhost/calendar/sync-all"
+      );
       const { message, totalUpdated, totalAdded, totalDeleted } = response.data;
 
       setSyncMessage(
@@ -18,13 +20,15 @@ export const SyncAllCalendarsButton = () => {
       }, 3000);
     } catch (err: any) {
       console.error("Sync error:", err);
-      setSyncMessage(err.response?.data?.message || "Failed to synchronize calendars.");
+      setSyncMessage(
+        err.response?.data?.message || "Failed to synchronize calendars."
+      );
     }
   };
 
   return (
     <div>
-      <Button onClick={handleSyncAll} variant="outlined" sx={{ mt: 2 }}>
+      <Button onClick={handleSyncAll} variant="outline">
         Sync All Calendars
       </Button>
       {syncMessage && (

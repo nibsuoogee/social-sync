@@ -14,3 +14,15 @@ export const isSameDate = (a: Date, b: Date) =>
   a.getFullYear() === b.getFullYear() &&
   a.getMonth() === b.getMonth() &&
   a.getDate() === b.getDate();
+
+/**
+ * Takes either an ISO string or a date object and returns a date object.
+ */
+export function ensureDate(date: string | Date): Date {
+  if (typeof date === "string") {
+    const parsed = new Date(date);
+    return isNaN(parsed.getTime()) ? new Date() : parsed; // fallback if invalid
+  }
+
+  return date;
+}

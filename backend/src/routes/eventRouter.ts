@@ -16,6 +16,7 @@ import {
 } from "src/models/attendanceModel";
 import { tryCatch } from "@shared/src/tryCatch";
 import { MembershipDTO } from "src/models/membershipModel";
+import { randomUUIDv7 } from "bun";
 
 export const eventRouter = new Elysia()
   .use(jwtConfig)
@@ -39,6 +40,7 @@ export const eventRouter = new Elysia()
             const [event, errEvent] = await tryCatch(
               EventDTO.createEvent({
                 ...eventData,
+                ics_uid: eventData.ics_uid ?? randomUUIDv7(),
                 proposed_by_user_id: user.id,
                 user_read_only: false,
               })
