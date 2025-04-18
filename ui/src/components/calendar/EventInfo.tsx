@@ -186,11 +186,11 @@ export const EventInfo = ({ event, calendarId }: EventInfoProps) => {
   ];
 
   return (
-    <div className="w-full flex flex-col gap-2 border-black">
+    <div className="w-full flex flex-col gap-4 border-black">
       {elements.map((element, index) => (
         <div key={index} className="flex items-center gap-2">
-          <element.icon className="w-6 opacity-30" />
-          {element.content}
+          <element.icon className="w-6 opacity-30 mr-2" />
+          <div>{element.content}</div>
         </div>
       ))}
 

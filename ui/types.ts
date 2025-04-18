@@ -26,4 +26,7 @@ export type {
 
 export type { Attendance } from "../backend/src/models/attendanceModel";
 
-export type { Membership } from "../backend/src/models/membershipModel";
+export type {
+  Membership,
+  GroupMemberInfo,
+} from "../backend/src/models/membershipModel";

@@ -78,7 +78,7 @@ export const MainMenu = () => {
           <Button
             onClick={navigateAllCalendars}
             variant={"outline"}
-            className="w-full flex items-center justify-start mb-2  border-black"
+            className="w-full flex items-center justify-start mb-2 border-black"
           >
             <CalendarDaysIcon
               className="size-6 ml-2"

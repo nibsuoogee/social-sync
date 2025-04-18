@@ -49,8 +49,9 @@ export const CalendarCell = (props: DayProps) => {
   // Add all events from all calendars as eventblocks to array
   // and then take a slice
   const allEventBlocksFiltered = calendarsAndEventsFiltered.flatMap(
-    (filtered) => {
+    (filtered, index) => {
       const { calendar, events } = filtered;
+
       const sortedEvents = events.sort(function (a, b) {
         if (a.all_day && !b.all_day) return -1;
         if (!a.all_day && b.all_day) return 1;
@@ -61,12 +62,13 @@ export const CalendarCell = (props: DayProps) => {
       });
       return sortedEvents.map((event) => {
         return (
-          <div key={event.id}>
+          <div key={`${index}-${event.id}`}>
             <EventBlock
               event={event}
               calendarId={calendar.id}
               bgColor={calendar.color}
               customClass="min-h-6 max-h-10 h-min"
+              borderStyle={calendar.is_group ? "solid" : ""}
             />
           </div>
         );
@@ -206,7 +208,7 @@ export const CalendarCell = (props: DayProps) => {
               borderColor:
                 contextCalendarsAndEvents[0]?.calendar?.color ?? "#cccccc",
             }}
-            className="h-4 border border-dashed border-3 opacity-0 hover:opacity-100 w-full"
+            className="h-8 border border-dashed border-3 opacity-0 hover:opacity-100 w-full"
           />
         ) : null}
       </div>

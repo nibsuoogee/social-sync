@@ -1,4 +1,5 @@
-import { Button, Input } from "@mui/joy";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -10,7 +11,7 @@ export const CalendarImportForm = () => {
   const [error, setError] = useState("");
 
   const handleImport = async () => {
-    if (!calendarUrl || !calendarName) { 
+    if (!calendarUrl || !calendarName) {
       setError("Please provide a calendar name and URL");
       setMessage("");
       return;
@@ -35,7 +36,11 @@ export const CalendarImportForm = () => {
       setShowForm(false);
     } catch (err: any) {
       console.error("Import error:", err);
-      setError(err.response?.data?.message || err.response?.data || "Failed to import calendar")
+      setError(
+        err.response?.data?.message ||
+          err.response?.data ||
+          "Failed to import calendar"
+      );
       setMessage("");
     }
   };
@@ -43,7 +48,8 @@ export const CalendarImportForm = () => {
   useEffect(() => {
     if (message || error) {
       const timer = setTimeout(() => {
-        setMessage(""); setError("");
+        setMessage("");
+        setError("");
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -51,35 +57,30 @@ export const CalendarImportForm = () => {
 
   return (
     <div style={{ position: "relative" }}>
-      <Button
-        variant="outlined"
-        onClick={() => setShowForm((prev) => !prev)}
-      >
+      <Button variant="outline" onClick={() => setShowForm((prev) => !prev)}>
         ⬆ Import
       </Button>
-  
+
       {showForm && (
         <div style={{ marginTop: "1rem" }}>
           <Input
             placeholder="Calendar name"
             value={calendarName}
             onChange={(e) => setCalendarName(e.target.value)}
-            sx={{ mb: 1 }}
           />
           <Input
             placeholder="Paste .ics URL"
             value={calendarUrl}
             onChange={(e) => setCalendarUrl(e.target.value)}
-            sx={{ mb: 1 }}
           />
-          <Button onClick={handleImport} fullWidth>
-            Create
-          </Button>
+          <Button onClick={handleImport}>Create</Button>
         </div>
       )}
-  
+
       {message && (
-        <div style={{ marginTop: "0.75rem", fontSize: "0.9rem", color: "green" }}>
+        <div
+          style={{ marginTop: "0.75rem", fontSize: "0.9rem", color: "green" }}
+        >
           {message}
         </div>
       )}

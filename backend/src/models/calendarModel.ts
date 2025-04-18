@@ -22,6 +22,18 @@ export const CalendarDTO = {
       WHERE memberships.user_id = ${user_id}`;
     return [...calendars];
   },
+  getCalendarsExcludeOne: async (
+    user_id: number,
+    excludeCalendarId: number
+  ): Promise<Calendar[]> => {
+    const calendars = await sql`
+      SELECT calendars.*
+      FROM calendars
+      JOIN memberships ON calendars.id = memberships.calendar_id
+      WHERE memberships.user_id = ${user_id}
+      AND calendars.id <> ${excludeCalendarId}`;
+    return [...calendars];
+  },
   getCalendar: async (calendar_id: number): Promise<Calendar> => {
     const [calendar] = await sql`
       SELECT * FROM calendars
