@@ -5,7 +5,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { getTextColor } from "@/lib/color";
+import { textColorByLuminance } from "@/lib/color";
 import { isoDateToHoursMinutes } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import { Calendar, Event, EventEditPermission } from "@types";
@@ -42,7 +42,7 @@ export const EventBlock = ({
     : event.end_time
     ? isoDateToHoursMinutes(event.end_time)
     : "";
-  const textColor = getTextColor(bgColor);
+  const textColor = textColorByLuminance(bgColor);
 
   return (
     <>

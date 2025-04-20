@@ -25,7 +25,10 @@ export type {
   EventUpdateBody,
 } from "../backend/src/models/eventsModel";
 
-export type { Attendance } from "../backend/src/models/attendanceModel";
+export type {
+  Attendance,
+  AttendanceDetails,
+} from "../backend/src/models/attendanceModel";
 
 export type {
   Membership,

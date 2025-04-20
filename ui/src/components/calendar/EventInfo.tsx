@@ -1,23 +1,41 @@
+import { ColorBadge } from "@/components/ColorBadge";
 import { EditableField } from "@/components/EditableField";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TimePicker24h } from "@/components/ui/timePicker";
 import { useEventsContext } from "@/contexts/EventsContext";
 import { cn } from "@/lib/utils";
+import { attendanceService } from "@/services/attendance";
 import { eventService } from "@/services/event";
 import {
   Bars3BottomLeftIcon,
   CheckIcon,
+  ChevronDownIcon,
   ClockIcon,
+  HandThumbUpIcon,
   InformationCircleIcon,
   MapPinIcon,
   PencilSquareIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Calendar, Event, EventEditPermission } from "@types";
+import {
+  AttendanceDetails,
+  Calendar,
+  Event,
+  EventEditPermission,
+} from "@types";
 import { format } from "date-fns";
-import { JSX, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type EventInfoProps = {
   event: Event;
@@ -30,10 +48,14 @@ export const EventInfo = ({
   calendar,
   editPermission,
 }: EventInfoProps) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [temporaryEvent, setTemporaryEvent] = useState<Partial<Event>>({});
   const { contextSetCalendarView } = useEventsContext();
   const navigate = useNavigate();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [temporaryEvent, setTemporaryEvent] = useState<Partial<Event>>({});
+  const [attendances, setAttendances] = useState<AttendanceDetails[]>([]);
+  const [myAttendance, setMyAttendance] =
+    useState<AttendanceDetails["status"]>("needs-action");
 
   function saveEvent() {
     // 1) update the event in the context
@@ -108,6 +130,39 @@ export const EventInfo = ({
     }
   }
 
+  async function getAttendance() {
+    const attendancesResult = await attendanceService.getAttendances(event.id);
+    if (!attendancesResult) return;
+
+    setAttendances(attendancesResult);
+  }
+
+  function attendanceColor(status: AttendanceDetails["status"]): string {
+    switch (status) {
+      case "needs-action":
+        return ` #ffdd11`;
+      case "tentative":
+        return `rgb(177, 63, 252)`;
+      case "accepted":
+        return `rgb(16, 255, 143)`;
+      case "declined":
+        return `rgb(255, 17, 100)`;
+    }
+  }
+
+  const statusText: Record<AttendanceDetails["status"], string> = {
+    "needs-action": "Needs action",
+    tentative: "Tentative",
+    accepted: "Accepted",
+    declined: "Declined",
+  };
+
+  useEffect(() => {
+    if (!calendar.is_group) return;
+
+    getAttendance();
+  }, []);
+
   const elements: {
     icon: React.ForwardRefExoticComponent<
       Omit<React.SVGProps<SVGSVGElement>, "ref"> & {
@@ -115,7 +170,7 @@ export const EventInfo = ({
         titleId?: string;
       } & React.RefAttributes<SVGSVGElement>
     >;
-    content: JSX.Element;
+    content: JSX.Element | undefined;
   }[] = [
     {
       icon: InformationCircleIcon,
@@ -205,14 +260,69 @@ export const EventInfo = ({
         />
       ),
     },
+    {
+      icon: HandThumbUpIcon,
+      content: calendar.is_group ? (
+        <div className="flex flex-col gap-2 w-full">
+          {attendances?.map((attendance, index) => {
+            return (
+              <div
+                key={index}
+                className="flex items-center justify-between gap-2"
+              >
+                <div className="line-clamp-2 truncate whitespace-normal">
+                  {attendance.username}
+                </div>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-38 justify-start">
+                      <ChevronDownIcon className="w-4" />
+                      <ColorBadge
+                        text={statusText[myAttendance]}
+                        color={attendanceColor(myAttendance)}
+                      />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-48" align="start">
+                    <DropdownMenuLabel>Attendance</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuRadioGroup
+                      value={myAttendance}
+                      onValueChange={(value) =>
+                        setMyAttendance(value as AttendanceDetails["status"])
+                      }
+                    >
+                      <DropdownMenuRadioItem value="accepted">
+                        Accepted
+                      </DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="declined">
+                        Declined
+                      </DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="tentative">
+                        Tentative
+                      </DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            );
+          })}
+        </div>
+      ) : undefined,
+    },
   ];
 
   return (
     <div className="w-full flex flex-col gap-4 border-black">
       {elements.map((element, index) => (
-        <div key={index} className="flex items-center gap-2">
-          <element.icon className="w-6 opacity-30 mr-2" />
-          <div>{element.content}</div>
+        <div key={index}>
+          {typeof element.content !== "undefined" ? (
+            <div className="flex items-center gap-2 w-full">
+              <element.icon className="w-6 opacity-30 mr-2" />
+              {element.content}
+            </div>
+          ) : null}
         </div>
       ))}
 
