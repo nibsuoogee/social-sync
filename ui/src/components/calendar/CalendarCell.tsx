@@ -6,8 +6,13 @@ import { isSameDate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { deepCopy } from "@/lib/utils";
-import { defaultEventModelBody } from "@/lib/defaultObjects";
+import {
+  defaultCalendarView,
+  defaultEventModelBody,
+} from "@/lib/defaultObjects";
 import { eventService } from "@/services/event";
+import { CalendarAndEvents } from "@/services/calendar";
+import { CalendarViewKey, EventEditPermission } from "@types";
 
 const MAX_VISIBLE_EVENTS = 3;
 
@@ -16,16 +21,19 @@ const MAX_VISIBLE_EVENTS = 3;
  * create an event when the user clicks inside it.
  */
 export const CalendarCell = (props: DayProps) => {
-  const { contextCalendarsAndEvents, contextSetCalendarsAndEvents } =
-    useEventsContext();
+  const {
+    contextCalendarVariant,
+    contextCalendarView,
+    contextSetCalendarView,
+  } = useEventsContext();
   const [firstVisibleEvent, setFirstVisibleEvent] = useState<
     number | undefined
   >();
+  const dayCalendars = deepCopy(defaultCalendarView);
   const noEventsInCell = typeof firstVisibleEvent === "undefined";
   const buttonRef = useRef<HTMLButtonElement>(
     null
   ) as RefObject<HTMLButtonElement>;
-  const isSingleCalendar = contextCalendarsAndEvents.length === 1;
 
   const { isHidden, isButton, /*buttonProps,*/ divProps } = useDayRender(
     props.date,
@@ -33,23 +41,41 @@ export const CalendarCell = (props: DayProps) => {
     buttonRef
   );
 
-  // day content
-  const calendarsAndEventsFiltered = contextCalendarsAndEvents.map((cal) => {
-    const filteredEvents = cal.events.filter((e) => {
-      const eventDate = new Date(e.start_time); // ISO string -> Date object
+  const filterCalendarToday = (calendarAndEvents: CalendarAndEvents[]) =>
+    calendarAndEvents.map((cal) => {
+      const filteredEvents = cal.events.filter((e) => {
+        const eventDate = new Date(e.start_time); // ISO string -> Date object
 
-      if (isSameDate(eventDate, props.date)) return true;
+        if (isSameDate(eventDate, props.date)) return true;
 
-      return false;
+        return false;
+      });
+
+      return { calendar: cal.calendar, events: filteredEvents };
     });
 
-    return { calendar: cal.calendar, events: filteredEvents };
+  // day content
+  const calendarViewKeys: CalendarViewKey[] = [
+    "mainCalendar",
+    "personalCalendars",
+    "groupMemberCalendars",
+  ];
+
+  const calendarViewPermissions: Record<CalendarViewKey, EventEditPermission> =
+    {
+      mainCalendar: "default",
+      personalCalendars: "navigate",
+      groupMemberCalendars: "restrict",
+    };
+
+  calendarViewKeys.forEach((view) => {
+    dayCalendars[view] = filterCalendarToday(contextCalendarView[view]);
   });
 
   // Add all events from all calendars as eventblocks to array
   // and then take a slice
-  const allEventBlocksFiltered = calendarsAndEventsFiltered.flatMap(
-    (filtered, index) => {
+  const allEventBlocksFiltered = calendarViewKeys.flatMap((view) =>
+    dayCalendars[view].flatMap((filtered, calendarIndex) => {
       const { calendar, events } = filtered;
 
       const sortedEvents = events.sort(function (a, b) {
@@ -60,20 +86,27 @@ export const CalendarCell = (props: DayProps) => {
           new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
         );
       });
+
       return sortedEvents.map((event) => {
         return (
-          <div key={`${index}-${event.id}`}>
+          <div key={`${view}-${calendarIndex}-${event.id}`}>
             <EventBlock
               event={event}
-              calendarId={calendar.id}
+              calendar={calendar}
               bgColor={calendar.color}
               customClass="min-h-6 max-h-10 h-min"
               borderStyle={calendar.is_group ? "solid" : ""}
+              editPermission={
+                contextCalendarVariant === "group" &&
+                view === "personalCalendars"
+                  ? "navigateFullPersonal"
+                  : calendarViewPermissions[view]
+              }
             />
           </div>
         );
       });
-    }
+    })
   );
 
   useEffect(() => {
@@ -122,16 +155,17 @@ export const CalendarCell = (props: DayProps) => {
 
   const showingMaxEvents = visibleEvents.length === MAX_VISIBLE_EVENTS;
 
-  const canAddEvent = isSingleCalendar
-    ? noEventsInCell
-      ? true
-      : showingMaxEvents
-      ? false
-      : true
-    : false;
+  const canAddEvent =
+    contextCalendarVariant !== "fullPersonal"
+      ? noEventsInCell
+        ? true
+        : showingMaxEvents
+        ? false
+        : true
+      : false;
 
   async function addNewEvent(date: Date) {
-    const thisCalendarId = contextCalendarsAndEvents[0]?.calendar.id;
+    const thisCalendarId = contextCalendarView.mainCalendar[0]?.calendar.id;
     if (typeof thisCalendarId !== "number") return;
 
     // 1) create a new empty event
@@ -149,17 +183,16 @@ export const CalendarCell = (props: DayProps) => {
     const response = await eventService.postEvent(newEventBody);
     if (!response) return;
 
-    // 3) add the full event to the context
-    contextSetCalendarsAndEvents((prev) =>
-      prev.map((cal) =>
-        cal.calendar.id === thisCalendarId
-          ? {
-              ...cal,
-              events: [...cal.events, response.event],
-            }
-          : cal
-      )
-    );
+    // 3) add the full event to the mainCalendar
+    contextSetCalendarView((prev) => ({
+      ...prev,
+      mainCalendar: [
+        {
+          ...prev.mainCalendar[0],
+          events: [...prev.mainCalendar[0].events, response.event],
+        },
+      ],
+    }));
   }
 
   // If it's a button day (clickable/selectable)
@@ -206,7 +239,8 @@ export const CalendarCell = (props: DayProps) => {
             style={{
               backgroundColor: "transparent",
               borderColor:
-                contextCalendarsAndEvents[0]?.calendar?.color ?? "#cccccc",
+                contextCalendarView.mainCalendar[0]?.calendar?.color ??
+                "#cccccc",
             }}
             className="h-8 border border-dashed border-3 opacity-0 hover:opacity-100 w-full"
           />

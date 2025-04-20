@@ -22,7 +22,7 @@ export const MembershipDTO = {
       SELECT EXISTS(SELECT 1 FROM memberships 
       WHERE calendar_id = ${calendar_id} 
       AND user_id = ${user_id})`;
-    return result;
+    return result.exists;
   },
   getIdByUserAndCalendar: async (
     calendar_id: number,
@@ -47,6 +47,19 @@ export const MembershipDTO = {
       SELECT * FROM memberships
       WHERE calendar_id = ${calendar_id}`;
     return [...members];
+  },
+  updateColor: async (
+    calendar_id: number,
+    user_id: number,
+    color: string
+  ): Promise<Membership> => {
+    const [newMembership] = await sql`
+      UPDATE memberships SET color = ${color}
+      WHERE calendar_id = ${calendar_id}
+      AND user_id = ${user_id}
+      RETURNING *
+    `;
+    return newMembership;
   },
   deleteMembership: async (
     calendar_id: number,
@@ -89,3 +102,9 @@ export const groupMemberInfo = t.Object({
   color: t.String(),
 });
 export type GroupMemberInfo = typeof groupMemberInfo.static;
+
+export const membershipColorUpdateBody = t.Object({
+  calendar_id: t.Integer(),
+  color: t.String(),
+});
+export type MembershipColorUpdateBody = typeof membershipColorUpdateBody.static;

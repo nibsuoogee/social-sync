@@ -8,14 +8,15 @@ import {
 import { getTextColor } from "@/lib/color";
 import { isoDateToHoursMinutes } from "@/lib/dates";
 import { cn } from "@/lib/utils";
-import { Event } from "@types";
+import { Calendar, Event, EventEditPermission } from "@types";
 
 type EventBlockProps = {
   event: Event;
-  calendarId: number;
+  calendar: Calendar;
   bgColor: string;
   customClass?: string;
   borderStyle?: string;
+  editPermission: EventEditPermission;
 };
 
 /**
@@ -25,10 +26,11 @@ type EventBlockProps = {
  */
 export const EventBlock = ({
   event,
-  calendarId,
+  calendar,
   bgColor,
   customClass,
   borderStyle,
+  editPermission,
 }: EventBlockProps) => {
   const startTimeText = event.all_day
     ? "All"
@@ -88,7 +90,11 @@ export const EventBlock = ({
           align="start"
           className="flex w-100 border-black"
         >
-          <EventInfo event={event} calendarId={calendarId} />
+          <EventInfo
+            event={event}
+            calendar={calendar}
+            editPermission={editPermission}
+          />
         </PopoverContent>
       </Popover>
     </>

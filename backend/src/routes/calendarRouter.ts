@@ -3,11 +3,15 @@ import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
 import {
   Calendar,
+  CalendarAndEvents,
   CalendarDTO,
   CalendarModelForCreation,
+  calendarAndEvents,
   calendarCreateBody,
   calendarModel,
   calendarUpdateBody,
+  calendarViewRequest,
+  defaultCalendar,
 } from "../models/calendarModel";
 import {
   MembershipDTO,
@@ -17,6 +21,7 @@ import {
 import { getRandomColor } from "@shared/src/util/random";
 import { tryCatch } from "@shared/src/tryCatch";
 import { Event, EventDTO, eventModel } from "src/models/eventsModel";
+import { deepCopy } from "src/utils/objects";
 
 /**
  * Get all the calendars for a specific user
@@ -79,6 +84,27 @@ async function getCalendarById(calendar_id: number) {
   if (!events) throw new Error("Failed to get events");
 
   return { calendar, events };
+}
+
+function calendarsToSingleCalendar(
+  calendars: CalendarAndEvents[],
+  membershipColor: string
+): CalendarAndEvents {
+  const temporaryCalendar = deepCopy(defaultCalendar);
+
+  if (calendars.length === 0)
+    return { calendar: temporaryCalendar, events: [] };
+
+  const allMemberEvents = calendars.flatMap(
+    (calendarsAndEvents) => calendarsAndEvents.events
+  );
+
+  temporaryCalendar.color = membershipColor;
+
+  return {
+    calendar: temporaryCalendar,
+    events: allMemberEvents,
+  };
 }
 
 export const calendarRouter = new Elysia()
@@ -167,16 +193,18 @@ export const calendarRouter = new Elysia()
             // 2) get the calendar and events
             const [calendar, err] = await tryCatch(getCalendarById(params.id));
             if (err) return error(500, err.message);
+            if (!calendar) return error(500, "Failed to get calendar");
 
-            return calendar;
+            return {
+              mainCalendar: [calendar],
+              personalCalendars: [],
+              groupMemberCalendars: [],
+            };
           },
           {
             params: t.Object({ id: t.Integer() }),
             response: {
-              200: t.Object({
-                calendar: calendarModel,
-                events: t.Array(eventModel),
-              }),
+              200: calendarViewRequest,
               401: t.String(),
               500: t.String(),
             },
@@ -189,17 +217,17 @@ export const calendarRouter = new Elysia()
               getAllCalendarsHandler(user.id)
             );
             if (err) return error(500, err.message);
+            if (!calendars) return error(500, "Failed to get calendars");
 
-            return calendars;
+            return {
+              mainCalendar: [],
+              personalCalendars: calendars,
+              groupMemberCalendars: [],
+            };
           },
           {
             response: {
-              200: t.Array(
-                t.Object({
-                  calendar: calendarModel,
-                  events: t.Array(eventModel),
-                })
-              ),
+              200: calendarViewRequest,
               401: t.String(),
               500: t.String(),
             },
@@ -223,79 +251,80 @@ export const calendarRouter = new Elysia()
             if (!hasMembership)
               return error(401, "No authorized access to calendar");
 
-            // 2) get the users with memberships
+            // 2) get the other users with memberships
             const [members, errMembers] = await tryCatch(
               MembershipDTO.getMemberships(params.id)
             );
             if (errMembers) return error(500, errMembers.message);
             if (!members) return error(500, "Failed to get members");
 
-            // 3) get the calendars of the members
-            const memberCalendars = await Promise.all(
-              members.map(async (member) => {
+            const otherMembers = members.filter((m) => m.user_id !== user.id);
+
+            // 3) get the user's calendars
+            const [userCalendars, errUserCalendars] = await tryCatch(
+              getAllCalendarsHandler(user.id, params.id)
+            );
+            if (errUserCalendars) return error(500, errUserCalendars.message);
+            if (!userCalendars)
+              return error(500, "Failed to get user calendars");
+
+            const userMembershipColor = members.filter(
+              (m) => m.user_id === user.id
+            )[0].color;
+
+            // 4) get the calendars of the other members and combine them
+            //    into single calendars
+            const memberCalendarsWithError = await Promise.all(
+              otherMembers.map(async (member) => {
                 const [calendarsAndEvents, err] = await tryCatch(
                   getAllCalendarsHandler(member.user_id, params.id)
                 );
                 if (err) return { errorMessage: err.message };
+                if (!calendarsAndEvents)
+                  return { errorMessage: "Failed to get calendars and events" };
 
-                return { calendarsAndEvents, membershipColor: member.color };
+                return calendarsToSingleCalendar(
+                  calendarsAndEvents,
+                  member.color
+                );
               })
             );
 
-            for (const result of memberCalendars) {
-              const { errorMessage, calendarsAndEvents } = result;
-              if (errorMessage) return error(500, errorMessage);
-              if (!calendarsAndEvents)
-                return error(500, "Failed to get calendars and events");
-            }
-
-            // 4) concat personal calendars into single personal calendars
-            const newCalendarsAndEvents = memberCalendars.map(
-              (memberCalendar) => {
-                if (!memberCalendar.calendarsAndEvents) return;
-
-                const allMemberEvents =
-                  memberCalendar.calendarsAndEvents.flatMap(
-                    (calendarsAndEvents) => calendarsAndEvents.events
-                  );
-
-                if (memberCalendar.calendarsAndEvents.length === 0)
-                  return undefined;
-
-                const temporaryCalendar =
-                  memberCalendar.calendarsAndEvents[0].calendar;
-                temporaryCalendar.color = memberCalendar.membershipColor;
-
-                return {
-                  calendar: temporaryCalendar,
-                  events: allMemberEvents,
-                } as {
-                  calendar: Calendar;
-                  events: Event[];
-                };
+            // 5) check for errors
+            for (const result of memberCalendarsWithError) {
+              if ("errorMessage" in result) {
+                return error(500, result.errorMessage);
               }
+            }
+            const memberCalendars = memberCalendarsWithError.filter(
+              (cal): cal is CalendarAndEvents => !("errorMessage" in cal)
             );
 
-            const response = newCalendarsAndEvents.filter(
-              (n) => typeof n !== "undefined"
+            // 6) concat personal calendars into single personal calendar
+            const personalCalendar = calendarsToSingleCalendar(
+              userCalendars,
+              userMembershipColor
             );
 
-            // 5) get the group calendar
-            const [calendar, err] = await tryCatch(getCalendarById(params.id));
+            // 7) get the group calendar
+            const [mainCalendar, err] = await tryCatch(
+              getCalendarById(params.id)
+            );
             if (err) return error(500, err.message);
+            if (!mainCalendar)
+              return error(500, "Failed to get group calendar");
 
-            // 6) return all calendars with the group one at the start
-            return [calendar].concat(response);
+            // 8) return the calendars
+            return {
+              mainCalendar: [mainCalendar],
+              personalCalendars: [personalCalendar],
+              groupMemberCalendars: memberCalendars,
+            };
           },
           {
             params: t.Object({ id: t.Integer() }),
             response: {
-              200: t.Array(
-                t.Object({
-                  calendar: calendarModel,
-                  events: t.Array(eventModel),
-                })
-              ),
+              200: calendarViewRequest,
               401: t.String(),
               500: t.String(),
             },

@@ -3,6 +3,7 @@ import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
 import {
   groupMemberInfo,
+  membershipColorUpdateBody,
   MembershipDTO,
   membershipModel,
 } from "../models/membershipModel";
@@ -45,6 +46,37 @@ export const membershipsRouter = new Elysia()
             params: t.Object({ calendar_id: t.Integer() }),
             response: {
               200: t.Array(groupMemberInfo),
+              401: t.String(),
+              500: t.String(),
+            },
+          }
+        )
+        .patch(
+          "/membership/color",
+          async ({ body, user, error }) => {
+            // 1) check if the user owns the membership
+            const [hasMembership, errOwner] = await tryCatch(
+              MembershipDTO.hasMembership(body.calendar_id, user.id)
+            );
+            if (errOwner) return error(500, errOwner.message);
+            if (!hasMembership)
+              return error(401, "No authorized access to membership");
+
+            // 2) Update the membership
+            const { calendar_id, color } = body;
+
+            const [membership, errMembership] = await tryCatch(
+              MembershipDTO.updateColor(calendar_id, user.id, color)
+            );
+            if (errMembership) return error(500, errMembership.message);
+            if (!membership) return error(500, "Failed to update membership");
+
+            return membership;
+          },
+          {
+            body: membershipColorUpdateBody,
+            response: {
+              200: membershipModel,
               401: t.String(),
               500: t.String(),
             },

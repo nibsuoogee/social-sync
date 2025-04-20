@@ -1,5 +1,6 @@
 import { t } from "elysia";
 import { sql } from "bun";
+import { eventModel } from "src/models/eventsModel";
 
 /**
  * Calendar Data Transfer Object
@@ -177,3 +178,37 @@ export type CalendarUpdateBody = typeof calendarUpdateBody.static;
 
 export const calendarModelForUpdate = t.Omit(calendarUpdateBody, ["id"]);
 export type CalendarModelForUpdate = typeof calendarModelForUpdate.static;
+
+export const calendarAndEvents = t.Object({
+  calendar: calendarModel,
+  events: t.Array(eventModel),
+});
+export type CalendarAndEvents = typeof calendarAndEvents.static;
+
+export const calendarViewRequest = t.Object({
+  mainCalendar: t.Array(calendarAndEvents),
+  personalCalendars: t.Array(calendarAndEvents),
+  groupMemberCalendars: t.Array(calendarAndEvents),
+});
+/**
+ * In the UI,
+ * 1) the mainCalendar is the one that new events will be added to (and
+ *    other event CRUD operations)
+ * 2) personalCalendars events can be navigated to for editing
+ * 3) and groupMemberCalendars evetns cannot be modified or accessed.
+ *
+ * In other words, personal and group member calendars supplement the
+ * calendar view and allow to plan around the events being modified in the
+ * mainCalendar.
+ */
+export type CalendarViewRequest = typeof calendarViewRequest.static;
+
+export const defaultCalendar: Calendar = {
+  id: -1,
+  name: "",
+  description: "",
+  owner_user_id: -1,
+  is_group: false,
+  created_at: new Date(),
+  color: "#000000",
+};

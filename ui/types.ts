@@ -8,6 +8,7 @@ export type {
   Calendar,
   CalendarCreateBody,
   CalendarUpdateBody,
+  CalendarViewRequest,
 } from "../backend/src/models/calendarModel";
 
 export type {
@@ -29,4 +30,18 @@ export type { Attendance } from "../backend/src/models/attendanceModel";
 export type {
   Membership,
   GroupMemberInfo,
+  MembershipColorUpdateBody,
 } from "../backend/src/models/membershipModel";
+
+export type CalendarVariant = "single" | "fullPersonal" | "group";
+
+export type CalendarViewKey =
+  | "mainCalendar"
+  | "personalCalendars"
+  | "groupMemberCalendars";
+
+export type EventEditPermission =
+  | "default"
+  | "navigate"
+  | "navigateFullPersonal"
+  | "restrict";
