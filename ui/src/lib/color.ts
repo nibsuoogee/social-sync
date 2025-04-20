@@ -21,7 +21,7 @@ function getLuminance(r: number, g: number, b: number): number {
  * color of a given background. Uses the luminance of the color.
  * @param bgColor The hex color of the background.
  */
-export function getTextColor(bgColor: string): "black" | "white" {
+export function textColorByLuminance(bgColor: string): "black" | "white" {
   const [r, g, b] = hexToRgb(bgColor);
   const luminance = getLuminance(r, g, b);
   return luminance > 0.5 ? "black" : "white"; // tweak threshold if needed

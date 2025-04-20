@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { membershipService } from "@/services/memberships";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { HexColorPicker } from "react-colorful";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -45,6 +46,7 @@ export const ChangeColor = ({ calendar_id }: { calendar_id: number }) => {
               <FormControl>
                 <Input placeholder="Color" {...field} />
               </FormControl>
+              <HexColorPicker color={field.value} onChange={field.onChange} />
               <FormDescription className="font-mono text-xs">
                 New color in hex code
               </FormDescription>

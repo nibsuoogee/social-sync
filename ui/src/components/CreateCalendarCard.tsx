@@ -17,6 +17,7 @@ import {
 import { Input } from "./ui/input";
 import { calendarService } from "@/services/calendar";
 import { Calendar } from "@types";
+import { HexColorPicker } from "react-colorful";
 
 const calendarFormSchema = z.object({
   color: z.string().regex(/^#([A-Fa-f0-9]{6})$/, {
@@ -81,6 +82,7 @@ export const CreateCalendarCard = ({
                 <FormControl>
                   <Input placeholder="Color" {...field} />
                 </FormControl>
+                <HexColorPicker color={field.value} onChange={field.onChange} />
                 <FormDescription className="font-mono text-xs">
                   Color in hex code
                 </FormDescription>

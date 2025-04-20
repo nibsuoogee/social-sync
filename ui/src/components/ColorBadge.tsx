@@ -1,18 +1,21 @@
 import { Badge } from "@/components/ui/badge";
+import { textColorByLuminance } from "@/lib/color";
+import { cn } from "@/lib/utils";
 
-type ColorBadgeProps = { text: string; color: string };
+type ColorBadgeProps = { text: string; color: string; className?: string };
 
 /**
  * Display a badge with a hex background color.
  * @param color A color in hex form.
  */
-export const ColorBadge = ({ text, color }: ColorBadgeProps) => {
+export const ColorBadge = ({ text, color, className }: ColorBadgeProps) => {
   return (
     <Badge
       style={{
         backgroundColor: color,
+        color: textColorByLuminance(color),
       }}
-      className={`text-${text} w-min`}
+      className={cn(`w-min`, className)}
     >
       {text}
     </Badge>
