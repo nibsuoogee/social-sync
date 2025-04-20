@@ -1,22 +1,31 @@
+import { ColorBadge } from "@/components/ColorBadge";
 import { EditableField } from "@/components/EditableField";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TimePicker24h } from "@/components/ui/timePicker";
 import { useEventsContext } from "@/contexts/EventsContext";
 import { cn } from "@/lib/utils";
+import { attendanceService } from "@/services/attendance";
 import { eventService } from "@/services/event";
 import {
   Bars3BottomLeftIcon,
   CheckIcon,
   ClockIcon,
+  HandThumbUpIcon,
   InformationCircleIcon,
   MapPinIcon,
   PencilSquareIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Calendar, Event, EventEditPermission } from "@types";
+import {
+  AttendanceDetails,
+  Calendar,
+  Event,
+  EventEditPermission,
+} from "@types";
 import { format } from "date-fns";
-import { JSX, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 type EventInfoProps = {
@@ -30,10 +39,12 @@ export const EventInfo = ({
   calendar,
   editPermission,
 }: EventInfoProps) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [temporaryEvent, setTemporaryEvent] = useState<Partial<Event>>({});
   const { contextSetCalendarView } = useEventsContext();
   const navigate = useNavigate();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [temporaryEvent, setTemporaryEvent] = useState<Partial<Event>>({});
+  const [attendances, setAttendances] = useState<AttendanceDetails[]>([]);
 
   function saveEvent() {
     // 1) update the event in the context
@@ -105,6 +116,26 @@ export const EventInfo = ({
         break;
       case "restrict":
         break;
+    }
+  }
+
+  async function getAttendance() {
+    const attendancesResult = await attendanceService.getAttendances(event.id);
+    if (!attendancesResult) return;
+
+    setAttendances(attendancesResult);
+  }
+
+  function attendanceColor(status: AttendanceDetails["status"]): string {
+    switch (status) {
+      case "needs-action":
+        return ` #ffdd11`;
+      case "tentative":
+        return `rgb(177, 63, 252)`;
+      case "accepted":
+        return `rgb(16, 255, 143)`;
+      case "declined":
+        return `rgb(255, 17, 100)`;
     }
   }
 
@@ -205,7 +236,32 @@ export const EventInfo = ({
         />
       ),
     },
+    {
+      icon: HandThumbUpIcon,
+      content: (
+        <>
+          <div className="flex flex-col gap-2">
+            {attendances?.map((attendance, index) => {
+              return (
+                <div key={index} className="flex gap-2 items-center">
+                  {attendance.username}
+                  {attendance.role === "owner" ? <Badge>Owner</Badge> : null}
+                  <ColorBadge
+                    text={attendance.status}
+                    color={attendanceColor(attendance.status)}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </>
+      ),
+    },
   ];
+
+  useEffect(() => {
+    getAttendance();
+  }, []);
 
   return (
     <div className="w-full flex flex-col gap-4 border-black">

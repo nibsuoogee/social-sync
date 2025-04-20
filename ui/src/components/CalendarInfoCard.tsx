@@ -4,8 +4,7 @@ import { calendarService } from "@/services/calendar";
 import { useCalendarListContext } from "@/contexts/CalendarListContext";
 import { useNavigate } from "react-router-dom";
 import { membershipService } from "@/services/memberships";
-import { Badge } from "@/components/ui/badge";
-import { getTextColor } from "@/lib/color";
+import { ColorBadge } from "@/components/ColorBadge";
 
 /**
  * This is shown when a user clicks on a calendar on the main menu.
@@ -34,28 +33,9 @@ export const CalendarInfoCard = ({ calendar }: { calendar: Calendar }) => {
     navigate(`/calendar/${calendar.is_group ? "group/" : ""}${calendar.id}`);
   };
 
-  /**
-   * Display a badge with the hex value in text and the color
-   * itself as the background.
-   * @param color A color in hex form.
-   */
-  function colourBadge(color: string) {
-    const textColor = getTextColor(color);
-    return (
-      <Badge
-        style={{
-          backgroundColor: color,
-        }}
-        className={`text-${textColor} w-min`}
-      >
-        {color}
-      </Badge>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-2 border-black">
-      {colourBadge(calendar.color)}
+      <ColorBadge text={calendar.color} color={calendar.color} />
       <h2 className="font-mono font-bold text-left mb-2">{calendar.name}</h2>
       <h2 className="font-mono text-sm text-left mb-2">
         {calendar.description}
