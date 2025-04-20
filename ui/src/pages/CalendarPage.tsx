@@ -1,19 +1,37 @@
 import { CalendarComponent } from "@/components/calendar/CalendarComponent";
+import { Button } from "@/components/ui/button";
 import { useEventsContext } from "@/contexts/EventsContext";
 import { calendarService } from "@/services/calendar";
-import { UserGroupIcon, UserIcon } from "@heroicons/react/24/outline";
-import { Calendar } from "@types";
+import {
+  Bars3BottomLeftIcon,
+  CalendarDaysIcon,
+  UserGroupIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
+import { Calendar, CalendarVariant } from "@types";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { CalendarOptions } from "@/components/calendar/CalendarOptions";
 
-export const CalendarPage = ({
-  allPersonalCalendars,
-}: {
-  allPersonalCalendars?: true;
-}) => {
+export const CalendarPage = ({ variant }: { variant: CalendarVariant }) => {
   const { calendar_id } = useParams();
-  const { contextCalendarsAndEvents, contextHandleCalendarsAndEvents } =
-    useEventsContext();
+  const {
+    contextSetCalendarVariant,
+    contextCalendarView,
+    contextSetCalendarView,
+  } = useEventsContext();
+
+  const mainCalendar = contextCalendarView.mainCalendar[0]?.calendar;
+  const calendarsLoaded =
+    Object.values(contextCalendarView).findIndex((v) => v.length > 0) !== -1;
 
   async function getCalendarEvents() {
     if (typeof calendar_id === "undefined") return;
@@ -21,52 +39,99 @@ export const CalendarPage = ({
     const result = await calendarService.getCalendar(calendar_id);
     if (!result) return;
 
-    contextHandleCalendarsAndEvents([result]);
+    contextSetCalendarView(result);
   }
 
   async function getEventsAllCalendars() {
     const result = await calendarService.getAllPersonalCalendars();
     if (!result) return;
 
-    contextHandleCalendarsAndEvents(result);
+    contextSetCalendarView(result);
+  }
+
+  async function getAllGroupCalendars() {
+    if (typeof calendar_id === "undefined") return;
+
+    const result = await calendarService.getGroupCalendar(calendar_id);
+    if (!result) return;
+
+    contextSetCalendarView(result);
   }
 
   useEffect(() => {
-    if (allPersonalCalendars) {
-      getEventsAllCalendars();
+    contextSetCalendarVariant(variant);
+
+    switch (variant) {
+      case "fullPersonal":
+        getEventsAllCalendars();
+        break;
+      case "group":
+        getAllGroupCalendars();
+        break;
+      case "single":
+        getCalendarEvents();
+        break;
     }
+  }, [calendar_id]);
 
-    getCalendarEvents();
-  }, []);
-
-  if (!contextCalendarsAndEvents[0]) return <div>loading...</div>;
+  if (!calendarsLoaded) return <div>loading...</div>;
 
   const calendarTitle = (calendar: Calendar) => {
-    const textBeforeIcon =
-      !calendar.is_group || allPersonalCalendars
-        ? "Personal calendar"
-        : "Group calendar";
     const CalendarIcon =
-      !calendar.is_group || allPersonalCalendars ? UserIcon : UserGroupIcon;
-    const calendarName = allPersonalCalendars ? "All calendars" : calendar.name;
-    const calendarColor = allPersonalCalendars ? "#000000" : calendar.color;
+      variant === "fullPersonal"
+        ? CalendarDaysIcon
+        : calendar?.is_group
+        ? UserGroupIcon
+        : UserIcon;
+    const calendarName =
+      variant === "fullPersonal" ? "Full personal calendar" : calendar?.name;
+    const calendarColor =
+      variant === "fullPersonal" ? "#000000" : calendar?.color;
 
     return (
-      <div className="flex items-center justify-start my-4 border-black gap-2">
-        <h3 className="font-mono">{`${textBeforeIcon}`}: </h3>
+      <>
         <CalendarIcon
           className="size-6 ml-2"
           style={{ color: calendarColor }}
         />
         <h3 className="font-mono">{calendarName}</h3>
-      </div>
+      </>
     );
   };
 
   return (
-    <div className="flex flex-col items-center">
-      {calendarTitle(contextCalendarsAndEvents[0].calendar)}
-      <CalendarComponent />
-    </div>
+    <Sheet>
+      <div className="flex flex-col items-center">
+        <div className="flex flex-col items-start">
+          <div className="flex items-center justify-start my-4 border-black gap-2 h-10">
+            {variant === "group" ? (
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="border-gray-500 hover:border-gray-800"
+                >
+                  <Bars3BottomLeftIcon className="w-6 mr-2" />
+                  Options
+                </Button>
+              </SheetTrigger>
+            ) : null}
+            {calendarTitle(mainCalendar)}
+          </div>
+          <CalendarComponent />
+        </div>
+      </div>
+      <SheetContent side="left">
+        <SheetHeader>
+          <SheetTitle>Options</SheetTitle>
+          <SheetDescription>
+            Calendar management options are found here
+          </SheetDescription>
+        </SheetHeader>
+
+        {mainCalendar ? (
+          <CalendarOptions calendar_id={mainCalendar.id} />
+        ) : null}
+      </SheetContent>
+    </Sheet>
   );
 };

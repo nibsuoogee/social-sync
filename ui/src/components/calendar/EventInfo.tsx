@@ -14,39 +14,45 @@ import {
   PencilSquareIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Event } from "@types";
+import { Calendar, Event, EventEditPermission } from "@types";
 import { format } from "date-fns";
 import { JSX, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 type EventInfoProps = {
   event: Event;
-  calendarId: number;
+  calendar: Calendar;
+  editPermission: EventEditPermission;
 };
 
-export const EventInfo = ({ event, calendarId }: EventInfoProps) => {
+export const EventInfo = ({
+  event,
+  calendar,
+  editPermission,
+}: EventInfoProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [temporaryEvent, setTemporaryEvent] = useState<Partial<Event>>({});
-  const { contextCalendarsAndEvents, contextSetCalendarsAndEvents } =
-    useEventsContext();
+  const { contextSetCalendarView } = useEventsContext();
+  const navigate = useNavigate();
 
   function saveEvent() {
-    const newCal = contextCalendarsAndEvents.map((cal) => {
-      if (cal.calendar.id !== calendarId) return cal;
+    // 1) update the event in the context
+    contextSetCalendarView((prev) => ({
+      ...prev,
+      mainCalendar: [
+        {
+          ...prev.mainCalendar[0],
+          events: prev.mainCalendar[0].events.map((e) => {
+            if (e.id !== event.id) return e;
 
-      return {
-        ...cal,
-        events: cal.events.map((e) => {
-          if (e.id !== event.id) return e;
-
-          return {
-            ...e,
-            ...temporaryEvent, // merge only changed fields
-          };
-        }),
-      };
-    });
-    // 1) use the context calendar handler to update this event
-    contextSetCalendarsAndEvents(newCal);
+            return {
+              ...e,
+              ...temporaryEvent, // merge only changed fields
+            };
+          }),
+        },
+      ],
+    }));
 
     // 2) send the updated event to the back end
     const patchEventBody = { ...temporaryEvent, id: event.id };
@@ -73,17 +79,33 @@ export const EventInfo = ({ event, calendarId }: EventInfoProps) => {
     eventService.deleteEvent(event.id);
 
     // 2) remove the event from the context
-    const newCal = contextCalendarsAndEvents.map((cal) => {
-      if (cal.calendar.id !== calendarId) return cal;
+    contextSetCalendarView((prev) => ({
+      ...prev,
+      mainCalendar: [
+        {
+          ...prev.mainCalendar[0],
+          events: prev.mainCalendar[0].events.filter((e) => e.id !== event.id),
+        },
+      ],
+    }));
+  }
 
-      return {
-        ...cal,
-        events: cal.events.filter((e) => e.id !== event.id),
-      };
-    });
-
-    // 1) use the context calendar handler to update this event
-    contextSetCalendarsAndEvents(newCal);
+  function handleEditEvent() {
+    switch (editPermission) {
+      case "default":
+        setIsEditing(true);
+        break;
+      case "navigate":
+        navigate(
+          `/calendar/${calendar.is_group ? "group/" : ""}${calendar.id}`
+        );
+        break;
+      case "navigateFullPersonal":
+        navigate(`/calendar/all`);
+        break;
+      case "restrict":
+        break;
+    }
   }
 
   const elements: {
@@ -186,11 +208,11 @@ export const EventInfo = ({ event, calendarId }: EventInfoProps) => {
   ];
 
   return (
-    <div className="w-full flex flex-col gap-2 border-black">
+    <div className="w-full flex flex-col gap-4 border-black">
       {elements.map((element, index) => (
         <div key={index} className="flex items-center gap-2">
-          <element.icon className="w-6 opacity-30" />
-          {element.content}
+          <element.icon className="w-6 opacity-30 mr-2" />
+          <div>{element.content}</div>
         </div>
       ))}
 
@@ -221,12 +243,15 @@ export const EventInfo = ({ event, calendarId }: EventInfoProps) => {
           </>
         ) : (
           <Button
-            onClick={() => setIsEditing(true)}
-            size="icon"
+            onClick={() => handleEditEvent()}
             variant="outline"
-            className="mr-auto"
+            className="mr-auto border-gray-500 hover:border-gray-800"
+            disabled={editPermission === "restrict"}
           >
             <PencilSquareIcon />
+            {["navigate", "navigateFullPersonal"].includes(editPermission)
+              ? "Go to calendar"
+              : ""}
           </Button>
         )}
       </div>

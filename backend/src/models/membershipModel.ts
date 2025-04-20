@@ -22,7 +22,7 @@ export const MembershipDTO = {
       SELECT EXISTS(SELECT 1 FROM memberships 
       WHERE calendar_id = ${calendar_id} 
       AND user_id = ${user_id})`;
-    return result;
+    return result.exists;
   },
   getIdByUserAndCalendar: async (
     calendar_id: number,
@@ -33,6 +33,33 @@ export const MembershipDTO = {
       WHERE calendar_id = ${calendar_id} 
       AND user_id = ${user_id}`;
     return result.id;
+  },
+  getMembers: async (calendar_id: number): Promise<GroupMemberInfo[]> => {
+    const members = await sql`
+      SELECT users.username, users.email, memberships.*
+      FROM users
+      JOIN memberships ON users.id = memberships.user_id
+      WHERE memberships.calendar_id = ${calendar_id}`;
+    return [...members];
+  },
+  getMemberships: async (calendar_id: number): Promise<Membership[]> => {
+    const members = await sql`
+      SELECT * FROM memberships
+      WHERE calendar_id = ${calendar_id}`;
+    return [...members];
+  },
+  updateColor: async (
+    calendar_id: number,
+    user_id: number,
+    color: string
+  ): Promise<Membership> => {
+    const [newMembership] = await sql`
+      UPDATE memberships SET color = ${color}
+      WHERE calendar_id = ${calendar_id}
+      AND user_id = ${user_id}
+      RETURNING *
+    `;
+    return newMembership;
   },
   deleteMembership: async (
     calendar_id: number,
@@ -64,3 +91,20 @@ export const membershipModel = t.Object({
   color: t.String(),
 });
 export type Membership = typeof membershipModel.static;
+
+export const groupMemberInfo = t.Object({
+  username: t.String(),
+  email: t.String(),
+  id: t.Integer(),
+  calendar_id: t.Integer(),
+  user_id: t.Integer(),
+  role: t.Enum({ owner: "owner", member: "member" }),
+  color: t.String(),
+});
+export type GroupMemberInfo = typeof groupMemberInfo.static;
+
+export const membershipColorUpdateBody = t.Object({
+  calendar_id: t.Integer(),
+  color: t.String(),
+});
+export type MembershipColorUpdateBody = typeof membershipColorUpdateBody.static;

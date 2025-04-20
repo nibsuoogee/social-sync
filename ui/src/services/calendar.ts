@@ -5,12 +5,12 @@ import {
   Calendar,
   CalendarCreateBody,
   CalendarUpdateBody,
+  CalendarViewRequest,
   Event,
   Membership,
 } from "@types";
 
 export type CalendarAndEvents = { calendar: Calendar; events: Event[] };
-
 interface PostCalendarResponse {
   calendar: Calendar;
   membership: Membership;
@@ -28,13 +28,18 @@ export const calendarService = {
     );
   },
   getAllPersonalCalendars: async () => {
-    return handleApiRequest<CalendarAndEvents[]>(() =>
+    return handleApiRequest<CalendarViewRequest>(() =>
       axios.get(`${BACKEND_URL}/calendar/all`)
     );
   },
   getCalendar: async (calendar_id: string) => {
-    return handleApiRequest<CalendarAndEvents>(() =>
+    return handleApiRequest<CalendarViewRequest>(() =>
       axios.get(`${BACKEND_URL}/calendar/${calendar_id}`)
+    );
+  },
+  getGroupCalendar: async (calendar_id: string) => {
+    return handleApiRequest<CalendarViewRequest>(() =>
+      axios.get(`${BACKEND_URL}/calendar/group/${calendar_id}`)
     );
   },
   patchCalendar: async (body: CalendarUpdateBody) => {

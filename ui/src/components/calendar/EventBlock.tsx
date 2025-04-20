@@ -8,14 +8,15 @@ import {
 import { getTextColor } from "@/lib/color";
 import { isoDateToHoursMinutes } from "@/lib/dates";
 import { cn } from "@/lib/utils";
-import { Event } from "@types";
+import { Calendar, Event, EventEditPermission } from "@types";
 
 type EventBlockProps = {
   event: Event;
-  calendarId: number;
+  calendar: Calendar;
   bgColor: string;
-  borderColor?: string;
   customClass?: string;
+  borderStyle?: string;
+  editPermission: EventEditPermission;
 };
 
 /**
@@ -25,10 +26,11 @@ type EventBlockProps = {
  */
 export const EventBlock = ({
   event,
-  calendarId,
+  calendar,
   bgColor,
-  borderColor = "transparent",
   customClass,
+  borderStyle,
+  editPermission,
 }: EventBlockProps) => {
   const startTimeText = event.all_day
     ? "All"
@@ -51,12 +53,16 @@ export const EventBlock = ({
             variant={"default"}
             style={{
               backgroundColor: bgColor,
-              borderColor: borderColor,
             }}
             className={cn(
               `text-${textColor}`,
               customClass,
-              "text-xs line-clamp-2 truncate whitespace-normal items-start text-left justify-start px-1 m-0 rounded-sm w-full hover:brightness-90"
+              "text-xs line-clamp-2 truncate whitespace-normal items-start text-left justify-start px-1 m-0 rounded-sm w-full hover:brightness-90",
+              {
+                "border border-gray-800 border-solid": borderStyle === "solid",
+                "border border-gray-800 border-dashed":
+                  borderStyle === "dashed",
+              }
             )}
           >
             <div
@@ -84,7 +90,11 @@ export const EventBlock = ({
           align="start"
           className="flex w-100 border-black"
         >
-          <EventInfo event={event} calendarId={calendarId} />
+          <EventInfo
+            event={event}
+            calendar={calendar}
+            editPermission={editPermission}
+          />
         </PopoverContent>
       </Popover>
     </>

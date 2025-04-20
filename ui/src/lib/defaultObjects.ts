@@ -1,3 +1,5 @@
+import { CalendarViewRequest } from "@types";
+
 export const defaultEventModelBody = {
   calendar_id: 0,
   title: "",
@@ -8,4 +10,10 @@ export const defaultEventModelBody = {
   timezone: "",
   all_day: false,
   recurrence_rule: "",
+};
+
+export const defaultCalendarView: CalendarViewRequest = {
+  mainCalendar: [],
+  personalCalendars: [],
+  groupMemberCalendars: [],
 };
