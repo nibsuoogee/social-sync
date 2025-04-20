@@ -85,11 +85,22 @@ export const membershipsRouter = new Elysia()
         .delete(
           "/memberships/:calendar_id",
           async ({ params, user, error }) => {
+            // 1) delete the membership
             const [deletedMembership, errDelete] = await tryCatch(
               MembershipDTO.deleteMembership(params.calendar_id, user.id)
             );
-
             if (errDelete) return error(500, errDelete.message);
+            if (!deletedMembership)
+              return error(500, "Failed to delete membership");
+
+            // 2) if the user was the owner, randomly select a new owner
+            if (deletedMembership.role === "member") return "Success";
+
+            const [newOwner, errNewOwner] = await tryCatch(
+              MembershipDTO.setNewOwner(params.calendar_id)
+            );
+            if (errNewOwner) return error(500, errNewOwner.message);
+            if (!newOwner) return error(500, "Failed to set new owner");
 
             return "Success";
           },
