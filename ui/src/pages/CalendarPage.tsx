@@ -90,11 +90,13 @@ export const CalendarPage = ({ variant }: { variant: CalendarVariant }) => {
 
     return (
       <>
-        <CalendarIcon
-          className="size-6 ml-2"
-          style={{ color: calendarColor }}
-        />
-        <h3 className="font-mono">{calendarName}</h3>
+        <>
+          <CalendarIcon
+            className="size-6 ml-2"
+            style={{ color: calendarColor }}
+          />
+          <h3 className="font-mono">{calendarName}</h3>
+        </>
       </>
     );
   };
