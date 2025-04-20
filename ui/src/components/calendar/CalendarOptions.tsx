@@ -1,5 +1,6 @@
 import { AddMember } from "@/components/calendar/AddMember";
 import { ChangeColor } from "@/components/calendar/ChangeColor";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { membershipService } from "@/services/memberships";
@@ -42,6 +43,7 @@ export const CalendarOptions = ({ calendar_id }: { calendar_id: number }) => {
             className="flex items-center justify-start border-black"
           >
             <UserIcon className="size-6 ml-2" style={{ color: member.color }} />
+            {member.role === "owner" ? <Badge>Owner</Badge> : null}
             <h4>
               {member.username} - {member.email}
             </h4>

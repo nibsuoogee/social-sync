@@ -61,6 +61,23 @@ export const MembershipDTO = {
     `;
     return newMembership;
   },
+  setNewOwner: async (calendar_id: number): Promise<Membership> => {
+    const [newOwner] = await sql`
+      WITH random_member AS (
+        SELECT * FROM memberships
+        WHERE calendar_id = ${calendar_id}
+        AND role != 'owner'
+        ORDER BY RANDOM()
+        LIMIT 1
+      )
+      UPDATE memberships
+      SET role = 'owner'
+      FROM random_member
+      WHERE memberships.id = random_member.id
+      RETURNING memberships.*
+    `;
+    return newOwner;
+  },
   deleteMembership: async (
     calendar_id: number,
     user_id: number
