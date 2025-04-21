@@ -15,6 +15,7 @@ import { invitationService } from "@/services/invitation";
 import { CalendarListContext } from "@/contexts/CalendarListContext";
 import { InvitationListContext } from "@/contexts/InvitationListContext";
 import { useNavigate } from "react-router-dom";
+import { ImportCalendarForm } from "@/components/ImportCalendarForm";
 
 export const MainMenu = () => {
   const navigate = useNavigate();
@@ -112,14 +113,22 @@ export const MainMenu = () => {
                 />
               </PopoverContent>
             </Popover>
-            <Button
-              variant={"outline"}
-              className="flex-1 border-double border-4 border-gray-500
-              hover:border-gray-800"
-            >
-              <ArrowDownIcon className="flex items-center justify-start" />
-              Import
-            </Button>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className="flex-1 border-double border-4 border-gray-500
+                hover:border-gray-800"
+                >
+                  <ArrowDownIcon className="flex items-center justify-start" />
+                  Import
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="flex max-w-full w-[400px] border-black">
+                <ImportCalendarForm addCalendar={handleAddCalendar} />
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </div>

@@ -10,7 +10,11 @@ import { MembershipDTO } from "../models/membershipModel";
 import { tryCatch } from "@shared/src/tryCatch";
 import { getRandomColor } from "@shared/src/util/random";
 
-async function createNewUserCalendar(userId: number, sourceUrl: string, name: string) {
+async function createNewUserCalendar(
+  userId: number,
+  sourceUrl: string,
+  name: string
+) {
   const now = new Date();
 
   const [calendar, errCalendar] = await tryCatch(
@@ -52,45 +56,56 @@ export const calendarUrlImportRouter = new Elysia()
       },
     },
     (app) =>
-      app.post("/calendar/import-url", async ({ user, body, error }) => {
-        const { url, name } = body as { url?: string; name?: string };
+      app
+        .post(
+          "/import", 
+          async ({ user, body, error }) => {
+            const { url, name } = body as { url?: string; name?: string };
 
-        if (!url || typeof url !== "string") {
-          return error(400, "Missing or invalid URL");
+
+            try {
+              const existingCalendar = await CalendarDTO.findByOwnerAndUrl(
+                user.id,
+                url
+              );
+              if (existingCalendar) {
+                return error(400, {
+                  message: "You have already imported this calendar.",
+                });
+              }
+
+              const parsed = await ical.async.fromURL(url);
+              const events = Object.values(parsed).filter(
+                (e): e is VEvent => (e as any).type === "VEVENT"
+              );
+              const upcomingEvents = filterUpcomingEvents(events, 90);
+              const calendarId = await createNewUserCalendar(user.id, url, name);
+
+              let importedCount = 0;
+              for (const e of upcomingEvents) {
+                const { added } = await addOrUpdateEvent(e, calendarId, user.id);
+                if (added) importedCount++;
+              }
+
+              return {
+                message: "Calendar imported",
+                events: importedCount,
+              };
+            } catch (err) {
+              console.error(err);
+              return error(500, "Failed to fetch or parse calendar");
+            }
+      }, {
+        body: "json",
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              message: { type: "string" },
+              events: { type: "number" },
+            },
+          },
         }
-        if (!name || typeof name !== "string") {
-          return error(400, "Missing or invalid calendar name");
-        }
-
-        try {
-          const existingCalendar = await CalendarDTO.findByOwnerAndUrl(
-            user.id,
-            url
-          );
-          if (existingCalendar) {
-            return error(400, { message: "You have already imported this calendar." });
-          }
-
-          const parsed = await ical.async.fromURL(url);
-          const events = Object.values(parsed).filter(
-            (e): e is VEvent => (e as any).type === "VEVENT"
-          );
-          const upcomingEvents = filterUpcomingEvents(events, 90);
-          const calendarId = await createNewUserCalendar(user.id, url, name);
-
-          let importedCount = 0;
-          for (const e of upcomingEvents) {
-            const { added } = await addOrUpdateEvent(e, calendarId, user.id);
-            if (added) importedCount++;
-          }
-
-          return {
-            message: "Calendar imported",
-            events: importedCount,
-          };
-        } catch (err) {
-          console.error(err);
-          return error(500, "Failed to fetch or parse calendar");
-        }
-      })
+      }
+    )
   );
