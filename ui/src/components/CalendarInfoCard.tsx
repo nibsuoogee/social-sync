@@ -4,6 +4,7 @@ import { calendarService } from "@/services/calendar";
 import { useCalendarListContext } from "@/contexts/CalendarListContext";
 import { useNavigate } from "react-router-dom";
 import { membershipService } from "@/services/memberships";
+import { ColorBadge } from "@/components/ColorBadge";
 
 /**
  * This is shown when a user clicks on a calendar on the main menu.
@@ -29,17 +30,12 @@ export const CalendarInfoCard = ({ calendar }: { calendar: Calendar }) => {
 
   const openCalendar = async () => {
     // navigate to the calendar
-    navigate(`/calendar/${calendar.id}`);
+    navigate(`/calendar/${calendar.is_group ? "group/" : ""}${calendar.id}`);
   };
 
   return (
     <div className="flex flex-col gap-2 border-black">
-      <h2
-        className="font-mono font-light text-gray-500 text-sm text-left mb-2"
-        style={{ color: calendar.color }}
-      >
-        {calendar.color}
-      </h2>
+      <ColorBadge text={calendar.color} color={calendar.color} />
       <h2 className="font-mono font-bold text-left mb-2">{calendar.name}</h2>
       <h2 className="font-mono text-sm text-left mb-2">
         {calendar.description}

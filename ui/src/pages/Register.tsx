@@ -1,8 +1,9 @@
-import { Button, Input } from "@mui/joy";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { userService } from "@/services/user";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export const Register = () => {
   const [username, setUsername] = useState("");

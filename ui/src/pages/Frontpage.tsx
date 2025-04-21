@@ -1,4 +1,4 @@
-import { Button } from "@mui/joy";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
 
 export const Frontpage = () => {

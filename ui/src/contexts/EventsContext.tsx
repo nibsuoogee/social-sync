@@ -1,9 +1,15 @@
-import { CalendarAndEvents } from "@/services/calendar";
+import { defaultCalendarView } from "@/lib/defaultObjects";
+import { deepCopy } from "@/lib/utils";
+import { CalendarVariant, CalendarViewRequest } from "@types";
 import { createContext, ReactNode, useContext, useState } from "react";
 
 type EventsContextType = {
-  contextCalendarsAndEvents: CalendarAndEvents[];
-  contextHandleCalendarsAndEvents: (value: CalendarAndEvents[]) => void;
+  contextCalendarVariant: CalendarVariant;
+  contextSetCalendarVariant: (value: CalendarVariant) => void;
+  contextCalendarView: CalendarViewRequest;
+  contextSetCalendarView: React.Dispatch<
+    React.SetStateAction<CalendarViewRequest>
+  >;
 };
 
 const EventsContext = createContext<EventsContextType | undefined>(undefined);
@@ -16,18 +22,18 @@ export const useEventsContext = () => {
 };
 
 export const EventsProvider = ({ children }: { children: ReactNode }) => {
-  const [contextCalendarsAndEvents, contextSetCalendarsAndEvents] = useState<
-    CalendarAndEvents[]
-  >([]);
+  const [contextCalendarVariant, contextSetCalendarVariant] =
+    useState<CalendarVariant>("single");
+  const [contextCalendarView, contextSetCalendarView] =
+    useState<CalendarViewRequest>(deepCopy(defaultCalendarView));
 
-  const contextHandleCalendarsAndEvents = (value: CalendarAndEvents[]) => {
-    contextSetCalendarsAndEvents(value);
-  };
   return (
     <EventsContext.Provider
       value={{
-        contextCalendarsAndEvents,
-        contextHandleCalendarsAndEvents,
+        contextCalendarVariant,
+        contextSetCalendarVariant,
+        contextCalendarView,
+        contextSetCalendarView,
       }}
     >
       {children}
