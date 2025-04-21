@@ -60,7 +60,7 @@ export const EventBlock = ({
               "text-xs line-clamp-2 truncate whitespace-normal items-start text-left justify-start px-1 m-0 rounded-sm w-full hover:brightness-90",
               {
                 "border border-gray-800 border-solid": borderStyle === "solid",
-                "border border-gray-800 border-dashed":
+                "border border-gray-800 border-dashed border-2":
                   borderStyle === "dashed",
               }
             )}
