@@ -130,11 +130,11 @@ export const calendarModel = t.Object({
     t.Union([
       t.Enum({
         inactive: "inactive",
-        active: "active",J
+        active: "active",
         failed: "failed",
       }),
       t.Null(),
-    ]
+    ])
   ),
 });
 export type Calendar = typeof calendarModel.static;

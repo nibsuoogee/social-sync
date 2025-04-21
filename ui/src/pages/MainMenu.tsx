@@ -110,8 +110,9 @@ export const MainMenu = () => {
                 </Button>
               </PopoverTrigger>
               <PopoverContent
-                side="bottom"
-                align="start"
+                side="right"
+                align="end"
+                flipXonMdScreenWidth
                 className="flex w-80 border-black"
               >
                 <CreateCalendarCard
@@ -132,7 +133,12 @@ export const MainMenu = () => {
                   Import
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="flex max-w-full w-[400px] border-black">
+              <PopoverContent
+                side="right"
+                align="end"
+                flipXonMdScreenWidth
+                className="z-50 w-[400px] max-h-[600px] overflow-auto border-black"
+              >
                 <ImportCalendarForm addCalendar={handleAddCalendar} />
               </PopoverContent>
             </Popover>

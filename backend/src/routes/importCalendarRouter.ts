@@ -1,50 +1,19 @@
-import { Elysia } from "elysia";
+import { Elysia, t } from "elysia";
 import ical, { VEvent } from "node-ical";
 
 import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
 import { filterUpcomingEvents, addOrUpdateEvent } from "../utils/calendarUtils";
 
-import { CalendarDTO } from "../models/calendarModel";
-import { MembershipDTO } from "../models/membershipModel";
+import {
+  calendarCreateBody,
+  CalendarDTO,
+  calendarModel,
+  CalendarModelForCreation,
+} from "../models/calendarModel";
+import { MembershipDTO, membershipModel } from "../models/membershipModel";
 import { tryCatch } from "@shared/src/tryCatch";
 import { getRandomColor } from "@shared/src/util/random";
-
-async function createNewUserCalendar(
-  userId: number,
-  sourceUrl: string,
-  name: string
-) {
-  const now = new Date();
-
-  const [calendar, errCalendar] = await tryCatch(
-    CalendarDTO.createCalendar({
-      name: name,
-      description: "Imported Calendar from URL",
-      owner_user_id: userId,
-      is_group: false,
-      color: getRandomColor(),
-      external_source_url: sourceUrl,
-      external_last_sync: now,
-      external_sync_status: "active",
-    })
-  );
-  if (errCalendar) throw new Error(errCalendar.message);
-  if (!calendar) throw new Error("Failed to create calendar");
-
-  const [membership, errMembership] = await tryCatch(
-    MembershipDTO.createMembership({
-      calendar_id: calendar.id,
-      user_id: userId,
-      role: "owner",
-      color: getRandomColor(),
-    })
-  );
-  if (errMembership) throw new Error(errMembership.message);
-  if (!membership) throw new Error("Failed to create membership");
-
-  return calendar.id;
-}
 
 export const calendarUrlImportRouter = new Elysia()
   .use(jwtConfig)
@@ -56,56 +25,74 @@ export const calendarUrlImportRouter = new Elysia()
       },
     },
     (app) =>
-      app
-        .post(
-          "/import", 
-          async ({ user, body, error }) => {
-            const { url, name } = body as { url?: string; name?: string };
+      app.post(
+        "/import",
+        async ({ body, user, error }) => {
+          // 1) creating calendar model for creation
+          const calendarForCreation: CalendarModelForCreation = {
+            owner_user_id: user.id,
+            external_sync_status: "active",
+            external_last_sync: new Date(),
+            ...body,
+          };
 
+          // if url was not defined
+          if (!body.external_source_url) {
+            return error(500, "Missing external source URL");
+          }
 
-            try {
-              const existingCalendar = await CalendarDTO.findByOwnerAndUrl(
-                user.id,
-                url
-              );
-              if (existingCalendar) {
-                return error(400, {
-                  message: "You have already imported this calendar.",
-                });
-              }
+          // 2) checking if imported calendar already exists
+          const [existingCalendar, errExistingCalendar] = await tryCatch(
+            CalendarDTO.findByOwnerAndUrl(user.id, body.external_source_url)
+          );
+          if (errExistingCalendar)
+            return error(500, errExistingCalendar.message);
+          if (existingCalendar)
+            return error(500, "You have already imported this calendar");
 
-              const parsed = await ical.async.fromURL(url);
-              const events = Object.values(parsed).filter(
-                (e): e is VEvent => (e as any).type === "VEVENT"
-              );
-              const upcomingEvents = filterUpcomingEvents(events, 90);
-              const calendarId = await createNewUserCalendar(user.id, url, name);
+          const parsed = await ical.async.fromURL(body.external_source_url);
 
-              let importedCount = 0;
-              for (const e of upcomingEvents) {
-                const { added } = await addOrUpdateEvent(e, calendarId, user.id);
-                if (added) importedCount++;
-              }
+          const events = Object.values(parsed).filter(
+            (e): e is VEvent => (e as any).type === "VEVENT"
+          );
+          const upcomingEvents = filterUpcomingEvents(events, 90);
 
-              return {
-                message: "Calendar imported",
-                events: importedCount,
-              };
-            } catch (err) {
-              console.error(err);
-              return error(500, "Failed to fetch or parse calendar");
-            }
-      }, {
-        body: "json",
-        response: {
-          200: {
-            type: "object",
-            properties: {
-              message: { type: "string" },
-              events: { type: "number" },
-            },
+          // 3) create calendar
+          const [calendar, errCalendar] = await tryCatch(
+            CalendarDTO.createCalendar(calendarForCreation)
+          );
+          if (errCalendar) throw new Error(errCalendar.message);
+          if (!calendar) throw new Error("Failed to create calendar");
+
+          // 4) create new membership for calendar
+          const [membership, errMembership] = await tryCatch(
+            MembershipDTO.createMembership({
+              calendar_id: calendar.id,
+              user_id: user.id,
+              role: "owner",
+              color: getRandomColor(),
+            })
+          );
+          if (errMembership) throw new Error(errMembership.message);
+          if (!membership) throw new Error("Failed to create membership");
+
+          let importedCount = 0;
+          for (const e of upcomingEvents) {
+            const { added } = await addOrUpdateEvent(e, calendar.id, user.id);
+            if (added) importedCount++;
+          }
+
+          return { calendar, membership };
+        },
+        {
+          body: calendarCreateBody,
+          response: {
+            200: t.Object({
+              calendar: calendarModel,
+              membership: membershipModel,
+            }),
+            500: t.String(),
           },
         }
-      }
-    )
+      )
   );

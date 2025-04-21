@@ -13,6 +13,7 @@ import {
   FormControl,
 } from "./ui/form";
 import { Calendar } from "@types";
+import { HexColorPicker } from "react-colorful";
 
 const importFormSchema = z.object({
   external_source_url: z.string().min(2, {
@@ -110,6 +111,12 @@ export const ImportCalendarForm = ({
                   <FormControl>
                     <Input placeholder={formItem.placeholder} {...field} />
                   </FormControl>
+                  {formItem.name === "color" ? (
+                    <HexColorPicker
+                      color={field.value}
+                      onChange={field.onChange}
+                    />
+                  ) : null}
                   <FormDescription className="text-xs">
                     {formItem.description}
                   </FormDescription>
