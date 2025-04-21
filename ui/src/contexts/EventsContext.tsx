@@ -1,7 +1,14 @@
 import { defaultCalendarView } from "@/lib/defaultObjects";
 import { deepCopy } from "@/lib/utils";
-import { CalendarVariant, CalendarViewRequest } from "@types";
+import { ProcessorEvent } from "@/services/processor";
+import { CalendarVariant, CalendarViewKey, CalendarViewRequest } from "@types";
 import { createContext, ReactNode, useContext, useState } from "react";
+
+export const calendarViewKeys: CalendarViewKey[] = [
+  "mainCalendar",
+  "personalCalendars",
+  "groupMemberCalendars",
+];
 
 type EventsContextType = {
   contextCalendarVariant: CalendarVariant;
@@ -9,6 +16,10 @@ type EventsContextType = {
   contextCalendarView: CalendarViewRequest;
   contextSetCalendarView: React.Dispatch<
     React.SetStateAction<CalendarViewRequest>
+  >;
+  contextEventProposals: ProcessorEvent[];
+  contextSetEventProposals: React.Dispatch<
+    React.SetStateAction<ProcessorEvent[]>
   >;
 };
 
@@ -26,6 +37,9 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
     useState<CalendarVariant>("single");
   const [contextCalendarView, contextSetCalendarView] =
     useState<CalendarViewRequest>(deepCopy(defaultCalendarView));
+  const [contextEventProposals, contextSetEventProposals] = useState<
+    ProcessorEvent[]
+  >([]);
 
   return (
     <EventsContext.Provider
@@ -34,6 +48,8 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
         contextSetCalendarVariant,
         contextCalendarView,
         contextSetCalendarView,
+        contextEventProposals,
+        contextSetEventProposals,
       }}
     >
       {children}

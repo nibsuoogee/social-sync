@@ -2,18 +2,22 @@ import { AddMember } from "@/components/calendar/AddMember";
 import { ChangeColor } from "@/components/calendar/ChangeColor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { calendarViewKeys, useEventsContext } from "@/contexts/EventsContext";
+import { defaultEvent } from "@/lib/defaultObjects";
+import { cn, deepCopy } from "@/lib/utils";
 import { membershipService } from "@/services/memberships";
+import { ProcessorEvent, processorService } from "@/services/processor";
 import {
   PaintBrushIcon,
   SparklesIcon,
   UserIcon,
   UserPlusIcon,
 } from "@heroicons/react/24/outline";
-import { GroupMemberInfo } from "@types";
+import { Event, GroupMemberInfo } from "@types";
 import { useEffect, useState } from "react";
 
 export const CalendarOptions = ({ calendar_id }: { calendar_id: number }) => {
+  const { contextCalendarView, contextSetCalendarView } = useEventsContext();
   const [showNewMemberInput, setShowNewMemberInput] = useState(false);
   const [showChangeColor, setShowChangeColor] = useState(false);
   const [members, setMembers] = useState<GroupMemberInfo[]>([]);
@@ -25,6 +29,40 @@ export const CalendarOptions = ({ calendar_id }: { calendar_id: number }) => {
     if (!membersResult) return;
 
     setMembers(membersResult);
+  }
+
+  async function handleGenerateProposals() {
+    const allEventsInView: ProcessorEvent[] = calendarViewKeys.flatMap((key) =>
+      contextCalendarView[key].flatMap((calendar) =>
+        calendar.events.flatMap((event) => ({
+          start_time: event.start_time,
+          end_time: event.end_time,
+          timezone: event.timezone,
+          all_day: event.all_day,
+        }))
+      )
+    );
+
+    const proposalsResult = await processorService.generateProposals(
+      allEventsInView
+    );
+    if (!proposalsResult) return;
+
+    // add the proposals to mainCalendar as events
+    const newEvents: Event[] = proposalsResult.proposals.map((p) => ({
+      ...deepCopy(defaultEvent),
+      ...p,
+    }));
+
+    contextSetCalendarView((prev) => ({
+      ...prev,
+      mainCalendar: [
+        {
+          ...prev.mainCalendar[0],
+          events: [...prev.mainCalendar[0].events, ...newEvents],
+        },
+      ],
+    }));
   }
 
   useEffect(() => {
@@ -81,7 +119,7 @@ export const CalendarOptions = ({ calendar_id }: { calendar_id: number }) => {
         {showChangeColor ? <ChangeColor calendar_id={calendar_id} /> : null}
 
         <Button
-          onClick={() => console.log("TODO")}
+          onClick={() => handleGenerateProposals()}
           variant="outline"
           className="flex items-center justify-start border-black"
         >

@@ -1,6 +1,6 @@
 import { JSX, RefObject, useEffect, useRef, useState } from "react";
 import { DayProps, useDayRender } from "react-day-picker";
-import { useEventsContext } from "@/contexts/EventsContext";
+import { calendarViewKeys, useEventsContext } from "@/contexts/EventsContext";
 import { EventBlock } from "@/components/calendar/EventBlock";
 import { isSameDate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
@@ -55,12 +55,6 @@ export const CalendarCell = (props: DayProps) => {
     });
 
   // day content
-  const calendarViewKeys: CalendarViewKey[] = [
-    "mainCalendar",
-    "personalCalendars",
-    "groupMemberCalendars",
-  ];
-
   const calendarViewPermissions: Record<CalendarViewKey, EventEditPermission> =
     {
       mainCalendar: "default",
@@ -95,7 +89,13 @@ export const CalendarCell = (props: DayProps) => {
               calendar={calendar}
               bgColor={calendar.color}
               customClass="min-h-6 max-h-10 h-min"
-              borderStyle={calendar.is_group ? "solid" : ""}
+              borderStyle={
+                event.status === "tentative"
+                  ? "dashed"
+                  : calendar.is_group
+                  ? "solid"
+                  : ""
+              }
               editPermission={
                 contextCalendarVariant === "group" &&
                 view === "personalCalendars"
@@ -197,6 +197,13 @@ export const CalendarCell = (props: DayProps) => {
 
   // If it's a button day (clickable/selectable)
   if (isButton) {
+    const isToday = isSameDate(new Date(), props.date);
+    const dateText = () => (
+      <h4 style={{ fontWeight: isToday ? "bold" : "normal" }}>
+        {props.date.getDate()}
+      </h4>
+    );
+
     return (
       <div className="flex flex-col text-xs w-full h-full border-solid border-1 border-gray-200">
         {/* <button
@@ -216,7 +223,7 @@ export const CalendarCell = (props: DayProps) => {
             >
               <ChevronLeftIcon />
             </Button>
-            {props.date.getDate()}
+            {dateText()}
             <Button
               onClick={nextPage}
               variant="ghost"
@@ -228,7 +235,7 @@ export const CalendarCell = (props: DayProps) => {
             </Button>
           </div>
         ) : (
-          <> {props.date.getDate()}</>
+          <>{dateText()}</>
         )}
 
         {visibleEvents}
