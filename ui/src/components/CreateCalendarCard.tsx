@@ -63,11 +63,11 @@ export const CreateCalendarCard = ({
   return (
     <div className="flex flex-col border-black">
       {isGroup ? (
-        <h2 className="font-mono font-bold text-sm text-left mb-2">
+        <h2 className="font-bold text-sm text-left mb-2">
           Create New Group Calendar
         </h2>
       ) : (
-        <h2 className="font-mono font-bold text-sm text-left mb-2">
+        <h2 className="font-bold text-sm text-left mb-2">
           Create New Personal Calendar
         </h2>
       )}
@@ -83,7 +83,7 @@ export const CreateCalendarCard = ({
                   <Input placeholder="Color" {...field} />
                 </FormControl>
                 <HexColorPicker color={field.value} onChange={field.onChange} />
-                <FormDescription className="font-mono text-xs">
+                <FormDescription className="text-xs">
                   Color in hex code
                 </FormDescription>
                 <FormMessage />
@@ -98,7 +98,7 @@ export const CreateCalendarCard = ({
                 <FormControl>
                   <Input placeholder="Title" {...field} />
                 </FormControl>
-                <FormDescription className="font-mono text-xs">
+                <FormDescription className="text-xs">
                   Name for your calendar
                 </FormDescription>
                 <FormMessage />
@@ -113,7 +113,7 @@ export const CreateCalendarCard = ({
                 <FormControl>
                   <Input placeholder="Description" {...field} />
                 </FormControl>
-                <FormDescription className="font-mono text-xs">
+                <FormDescription className="text-xs">
                   Tell what your calendar is about
                 </FormDescription>
                 <FormMessage />

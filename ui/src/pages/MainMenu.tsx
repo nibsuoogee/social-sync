@@ -19,6 +19,7 @@ import { invitationService } from "@/services/invitation";
 import { CalendarListContext } from "@/contexts/CalendarListContext";
 import { InvitationListContext } from "@/contexts/InvitationListContext";
 import { useNavigate } from "react-router-dom";
+import { ImportCalendarForm } from "@/components/ImportCalendarForm";
 
 export const MainMenu = () => {
   const navigate = useNavigate();
@@ -109,8 +110,9 @@ export const MainMenu = () => {
                 </Button>
               </PopoverTrigger>
               <PopoverContent
-                side="bottom"
-                align="start"
+                side="right"
+                align="end"
+                flipXonMdScreenWidth
                 className="flex w-80 border-black"
               >
                 <CreateCalendarCard
@@ -119,14 +121,27 @@ export const MainMenu = () => {
                 />
               </PopoverContent>
             </Popover>
-            <Button
-              variant={"outline"}
-              className="flex-1 border-double border-4 border-gray-500
-              hover:border-gray-800"
-            >
-              <ArrowDownIcon className="flex items-center justify-start" />
-              Import
-            </Button>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className="flex-1 border-double border-4 border-gray-500
+                hover:border-gray-800"
+                >
+                  <ArrowDownIcon className="flex items-center justify-start" />
+                  Import
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                side="right"
+                align="end"
+                flipXonMdScreenWidth
+                className="z-50 w-[400px] max-h-[600px] overflow-auto border-black"
+              >
+                <ImportCalendarForm addCalendar={handleAddCalendar} />
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </div>
