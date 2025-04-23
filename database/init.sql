@@ -126,3 +126,61 @@ CHECK (color ~ '^#[A-Fa-f0-9]{6}$');
 ALTER TABLE memberships
 ADD CONSTRAINT color_hex_constraint
 CHECK (color ~ '^#[A-Fa-f0-9]{6}$');
+
+-- Trigger functions
+
+-- When a new group event is created → create attendance rows for all group members
+
+ALTER TABLE event_attendance
+ADD CONSTRAINT event_attendance_event_membership_unique
+UNIQUE (event_id, membership_id);
+
+CREATE OR REPLACE FUNCTION trigger_add_attendance_on_new_group_event()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF (SELECT is_group FROM calendars WHERE id = NEW.calendars_id) THEN
+    INSERT INTO event_attendance (event_id, membership_id, status)
+    SELECT NEW.events_id,
+           m.id,
+           'needs-action'::attendance_status
+    FROM   memberships m
+    WHERE  m.calendar_id = NEW.calendars_id
+    ON CONFLICT ON CONSTRAINT event_attendance_event_membership_unique DO NOTHING;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER add_attendance_on_new_group_event
+AFTER INSERT ON events_calendars
+FOR EACH ROW
+EXECUTE FUNCTION trigger_add_attendance_on_new_group_event();
+
+-- When a new member is added to a group calendar → create attendance rows for future events
+
+CREATE OR REPLACE FUNCTION trigger_add_attendance_on_new_membership()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF (SELECT is_group FROM calendars WHERE id = NEW.calendar_id) THEN
+    INSERT INTO event_attendance (event_id, membership_id, status)
+    SELECT ec.events_id,
+           NEW.id,
+           'needs-action'::attendance_status
+    FROM   events_calendars ec
+    JOIN   events e ON e.id = ec.events_id
+    WHERE  ec.calendars_id = NEW.calendar_id
+      AND  e.start_time >= NOW()
+    ON CONFLICT ON CONSTRAINT event_attendance_event_membership_unique DO NOTHING;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER add_attendance_on_new_membership
+AFTER INSERT ON memberships
+FOR EACH ROW
+EXECUTE FUNCTION trigger_add_attendance_on_new_membership();
