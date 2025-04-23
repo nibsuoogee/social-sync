@@ -60,6 +60,23 @@ export const MainMenu = () => {
     setPersonalCalendars((prev) => prev.concat([calendar]));
   };
 
+  /**
+   * Replace calendars by id in an array of calendars.
+   */
+  const handleEditCalendar = (
+    calendar: Calendar,
+    stateSetter: React.Dispatch<React.SetStateAction<Calendar[]>>
+  ) => {
+    stateSetter((prevCalendars) => {
+      return prevCalendars.map((prevCalendar) => {
+        if (prevCalendar.id === calendar.id) {
+          return calendar;
+        }
+        return prevCalendar;
+      });
+    });
+  };
+
   const navigateAllCalendars = () => {
     navigate("/calendar/all");
   };
@@ -93,6 +110,8 @@ export const MainMenu = () => {
               contextCalendars: personalCalendars,
               contextDeleteCalendar: handleDeleteCalendar,
               contextAddCalendar: handleAddCalendar,
+              contextEditCalendar: (calendar) =>
+                handleEditCalendar(calendar, setPersonalCalendars),
             }}
           >
             <CalendarList />
@@ -154,6 +173,8 @@ export const MainMenu = () => {
               contextCalendars: groupCalendars,
               contextDeleteCalendar: handleDeleteCalendar,
               contextAddCalendar: handleAddCalendar,
+              contextEditCalendar: (calendar) =>
+                handleEditCalendar(calendar, setGroupCalendars),
             }}
           >
             <CalendarList />
