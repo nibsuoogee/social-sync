@@ -5,6 +5,7 @@ type CalendarListContextType = {
   contextCalendars: Calendar[];
   contextDeleteCalendar: (id: number) => void;
   contextAddCalendar: (calendar: Calendar) => void;
+  contextEditCalendar: (calendar: Calendar) => void;
 };
 
 export const CalendarListContext = createContext<
