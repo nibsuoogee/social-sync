@@ -25,6 +25,7 @@ class Event(BaseModel):
     user_read_only: bool
 
 class ProcessorEvent(BaseModel):
+    id: int
     start_time: datetime
     end_time: datetime
     timezone: str

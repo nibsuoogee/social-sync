@@ -3,6 +3,7 @@ import { handleApiRequest } from "@/lib/requests";
 import axios from "axios";
 
 export type ProcessorEvent = {
+  id: number;
   start_time: Date;
   end_time: Date;
   timezone: string;

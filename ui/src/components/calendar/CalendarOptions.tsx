@@ -35,6 +35,7 @@ export const CalendarOptions = ({ calendar_id }: { calendar_id: number }) => {
     const allEventsInView: ProcessorEvent[] = calendarViewKeys.flatMap((key) =>
       contextCalendarView[key].flatMap((calendar) =>
         calendar.events.flatMap((event) => ({
+          id: event.id,
           start_time: event.start_time,
           end_time: event.end_time,
           timezone: event.timezone,

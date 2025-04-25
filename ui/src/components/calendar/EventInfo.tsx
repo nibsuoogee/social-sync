@@ -23,6 +23,7 @@ import {
   Calendar,
   Event,
   EventEditPermission,
+  EventModelBody,
 } from "@types";
 import { format } from "date-fns";
 import { JSX, useEffect, useState } from "react";
@@ -57,8 +58,7 @@ export const EventInfo = ({
   const [myAttendance, setMyAttendance] =
     useState<AttendanceDetails["status"]>("needs-action");
 
-  function saveEvent() {
-    // 1) update the event in the context
+  function patchEventInContext(partialEvent: Partial<Event>) {
     contextSetCalendarView((prev) => ({
       ...prev,
       mainCalendar: [
@@ -69,16 +69,43 @@ export const EventInfo = ({
 
             return {
               ...e,
-              ...temporaryEvent, // merge only changed fields
+              ...partialEvent, // merge only changed fields
             };
           }),
         },
       ],
     }));
+  }
 
-    // 2) send the updated event to the back end
-    const patchEventBody = { ...temporaryEvent, id: event.id };
-    eventService.patchEvent(patchEventBody);
+  async function saveEvent() {
+    const isProposedEvent = event.status === "tentative";
+    if (isProposedEvent) {
+      // 1) update the event in the context
+      const newEvent: EventModelBody = {
+        title: event.title,
+        description: event.description,
+        location: event.location,
+        start_time: new Date(event.start_time),
+        end_time: new Date(event.end_time),
+        timezone: event.timezone,
+        recurrence_rule: event.recurrence_rule,
+        ...temporaryEvent,
+        calendar_id: calendar.id,
+        status: "confirmed",
+      };
+      const response = await eventService.postEvent(newEvent);
+      if (!response) return;
+
+      // 2) update the event in the context
+      patchEventInContext(response.event);
+    } else {
+      // 1) update the event in the context
+      patchEventInContext(temporaryEvent);
+
+      // 2) send the updated event to the back end
+      const patchEventBody = { ...temporaryEvent, id: event.id };
+      eventService.patchEvent(patchEventBody);
+    }
 
     // 3) stop editing
     setIsEditing(false);
