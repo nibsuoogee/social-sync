@@ -2,6 +2,7 @@ from typing import List, Tuple, Optional, Set
 from datetime import datetime, timedelta, time, date
 from app.schemas import ProcessorEvent
 from random import sample
+import uuid
 
 def get_time_bounds(events: List[ProcessorEvent]) -> Optional[Tuple[datetime, datetime]]:
     """
@@ -55,6 +56,7 @@ def suggest_events_on_empty_days(
         suggestion_start = datetime.combine(day, time(9, 0))
         suggestion_end = datetime.combine(day, time(10, 0))
         suggestions.append(ProcessorEvent(
+            id=uuid.uuid4().int,
             start_time=suggestion_start,
             end_time=suggestion_end,
             timezone="UTC",  # adjust if needed

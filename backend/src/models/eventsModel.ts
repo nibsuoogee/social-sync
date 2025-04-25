@@ -141,6 +141,13 @@ export const eventModelBody = t.Object({
   timezone: t.Optional(t.String()),
   all_day: t.Optional(t.Boolean()),
   recurrence_rule: t.String(),
+  status: t.Optional(
+    t.Enum({
+      confirmed: "confirmed",
+      tentative: "tentative",
+      cancelled: "cancelled",
+    })
+  ),
 });
 export type EventModelBody = typeof eventModelBody.static;
 

@@ -24,8 +24,8 @@ class ProposalGenerator:
         if not bounds:
             return []
         
-        earliest_start, latest_end = bounds
-        print(f"Earliest: {earliest_start}, Latest: {latest_end}")
+        # earliest_start, latest_end = bounds
+        # print(f"Earliest: {earliest_start}, Latest: {latest_end}")
 
         # TODO use the bounds
         
