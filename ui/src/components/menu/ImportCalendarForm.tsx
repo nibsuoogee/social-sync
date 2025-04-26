@@ -1,5 +1,5 @@
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import { importService } from "@/services/import";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,7 +11,7 @@ import {
   FormItem,
   FormMessage,
   FormControl,
-} from "./ui/form";
+} from "../ui/form";
 import { Calendar } from "@types";
 import { HexColorPicker } from "react-colorful";
 

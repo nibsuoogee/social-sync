@@ -1,5 +1,5 @@
 import { NewInvitationsResponse } from "types";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { UserIcon } from "@heroicons/react/24/outline";
 import { useInvitationListContext } from "@/contexts/InvitationListContext";
 import { invitationService } from "@/services/invitation";
