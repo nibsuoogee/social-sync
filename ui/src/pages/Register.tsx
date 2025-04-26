@@ -73,7 +73,11 @@ export const Register = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Username" {...field} />
+                    <Input
+                      autoComplete="username"
+                      placeholder="Username"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription className="text-xs">
                     Give your username (min. 4 characters)
@@ -88,7 +92,11 @@ export const Register = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="E-mail" {...field} />
+                    <Input
+                      autoComplete="email"
+                      placeholder="E-mail"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription className="text-xs">
                     Give your email
@@ -103,7 +111,12 @@ export const Register = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input type="password" placeholder="Password" {...field} />
+                    <Input
+                      autoComplete="new-password"
+                      type="password"
+                      placeholder="Password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription className="text-xs">
                     Give password (min. 6 characters)

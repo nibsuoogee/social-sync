@@ -67,7 +67,11 @@ export const Login = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="E-mail" {...field} />
+                    <Input
+                      autoComplete="email"
+                      placeholder="E-mail"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription className="text-xs">
                     Give your email
@@ -82,7 +86,12 @@ export const Login = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input type="password" placeholder="Password" {...field} />
+                    <Input
+                      autoComplete="current-password"
+                      type="password"
+                      placeholder="Password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription className="text-xs">
                     Give password
