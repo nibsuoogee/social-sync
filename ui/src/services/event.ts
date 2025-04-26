@@ -1,17 +1,10 @@
 import { BACKEND_URL } from "@/lib/constants";
 import { handleApiRequest } from "@/lib/requests";
 import axios from "axios";
-import {
-  Attendance,
-  Event,
-  EventModelBody,
-  EventsCalendarsModel,
-} from "@types";
+import { Event, EventModelBody } from "@types";
 
 interface PostEventResponse {
   event: Event;
-  eventsCalendar: EventsCalendarsModel;
-  newAttendance: Attendance;
 }
 
 type EventPatchBody = { id: number } & Partial<Event>;

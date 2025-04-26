@@ -1,11 +1,11 @@
 import { Elysia } from "elysia";
 import ical, { VEvent } from "node-ical";
 
+import { EventDTO } from "src/models/eventsModel";
 import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
-import { filterUpcomingEvents, addOrUpdateEvent } from "../utils/calendarUtils";
 import { CalendarDTO } from "../models/calendarModel";
-import { EventDTO } from "src/models/eventsModel";
+import { addOrUpdateEvent, filterUpcomingEvents } from "../utils/calendarUtils";
 
 export const syncCalendarRouter = new Elysia()
   .use(jwtConfig)
@@ -19,7 +19,9 @@ export const syncCalendarRouter = new Elysia()
     (app) =>
       app.post("/calendar/sync-all", async ({ user, error }) => {
         try {
-          const calendars = await CalendarDTO.findAllWithExternalSource(user.id);
+          const calendars = await CalendarDTO.findAllWithExternalSource(
+            user.id
+          );
           if (calendars.length === 0) {
             return { message: "No calendars to sync." };
           }
@@ -30,12 +32,14 @@ export const syncCalendarRouter = new Elysia()
 
           for (const calendar of calendars) {
             if (!calendar.external_source_url) continue;
-            const parsed = await ical.async.fromURL(calendar.external_source_url);
+            const parsed = await ical.async.fromURL(
+              calendar.external_source_url
+            );
             const events = Object.values(parsed).filter(
               (e): e is VEvent => (e as any).type === "VEVENT"
             );
             const upcomingEvents = filterUpcomingEvents(events, 90);
-            const existingEvents = await EventDTO.findByCalendarId(calendar.id);
+            const existingEvents = await EventDTO.getEvents(calendar.id);
             const newEventUids = new Set(events.map((e) => e.uid));
             for (const existingEvent of existingEvents) {
               if (!newEventUids.has(existingEvent.ics_uid)) {
@@ -45,15 +49,16 @@ export const syncCalendarRouter = new Elysia()
             }
 
             for (const e of upcomingEvents) {
-              const { updated, added } = await addOrUpdateEvent(e, calendar.id, user.id);
+              const { updated, added } = await addOrUpdateEvent(
+                e,
+                calendar.id,
+                user.id
+              );
               if (updated) totalUpdated++;
               if (added) totalAdded++;
             }
 
-            await CalendarDTO.updateLastSync(
-                calendar.id,
-                new Date()
-            )
+            await CalendarDTO.updateLastSync(calendar.id, new Date());
           }
 
           return {

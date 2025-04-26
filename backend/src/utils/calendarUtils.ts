@@ -1,7 +1,6 @@
 import { VEvent } from "node-ical";
 import { RRule } from "rrule";
 import { EventDTO } from "../models/eventsModel";
-import { EventsCalendarsDTO } from "../models/eventsCalendarsModel";
 import { tryCatch } from "@shared/src/tryCatch";
 
 export const filterUpcomingEvents = (events: VEvent[], daysAhead: number) => {
@@ -20,7 +19,10 @@ export const addOrUpdateEvent = async (
   calendarId: number,
   userId: number
 ) => {
-  const existingEvent = await EventDTO.findByUidAndCalendar(event.uid, calendarId);
+  const existingEvent = await EventDTO.findByUidAndCalendar(
+    event.uid,
+    calendarId
+  );
   if (existingEvent) {
     const dbEvent = existingEvent;
     const hasChanged =
@@ -58,6 +60,7 @@ export const addOrUpdateEvent = async (
     const [newEvent, errNewEvent] = await tryCatch(
       EventDTO.createEvent({
         ics_uid: event.uid,
+        calendar_id: calendarId,
         title: event.summary,
         description: event.description || "",
         location: event.location || "",
@@ -76,16 +79,6 @@ export const addOrUpdateEvent = async (
       return { updated: false, added: false };
     }
 
-    const [linked, errLinked] = await tryCatch(
-      EventsCalendarsDTO.linkEventToCalendar({
-        events_id: newEvent.id,
-        calendars_id: calendarId,
-      })
-    );
-    if (errLinked) {
-      console.error("Failed to link event to calendar:", errLinked);
-      return { updated: false, added: false };
-    }
     return { updated: false, added: true };
   }
 };

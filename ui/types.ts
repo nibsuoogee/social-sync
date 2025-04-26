@@ -21,7 +21,6 @@ export type {
 export type {
   Event,
   EventModelBody,
-  EventsCalendarsModel,
   EventUpdateBody,
 } from "../backend/src/models/eventsModel";
 
