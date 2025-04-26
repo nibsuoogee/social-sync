@@ -15,7 +15,7 @@ export const ColorBadge = ({ text, color, className }: ColorBadgeProps) => {
         backgroundColor: color,
         color: textColorByLuminance(color),
       }}
-      className={cn(`w-min`, className)}
+      className={cn(`w-min text-nowrap`, className)}
     >
       {text}
     </Badge>

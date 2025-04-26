@@ -27,6 +27,7 @@ export type {
 export type {
   Attendance,
   AttendanceDetails,
+  AttendanceUpdateBody,
 } from "../backend/src/models/attendanceModel";
 
 export type {
