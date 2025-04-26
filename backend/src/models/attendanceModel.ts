@@ -17,7 +17,9 @@ export const AttendanceDTO = {
   getAttendances: async (event_id: number): Promise<AttendanceDetails[]> => {
     const attendances = await sql`
       SELECT
+        users.id AS user_id,
         users.username,
+        memberships.id AS membership_id,
         memberships.role,
         memberships.color,
         event_attendance.status
@@ -27,6 +29,18 @@ export const AttendanceDTO = {
       WHERE event_attendance.event_id = ${event_id};
     `;
     return [...attendances];
+  },
+  updateAttendance: async (
+    attendance: AttendanceUpdateBody
+  ): Promise<Attendance> => {
+    const [updatedAttendance] = await sql`
+      UPDATE event_attendance 
+      SET status = ${attendance.status} 
+      WHERE membership_id = ${attendance.membership_id} 
+      AND event_id = ${attendance.event_id} 
+      RETURNING *
+      `;
+    return updatedAttendance;
   },
 };
 
@@ -59,7 +73,9 @@ export const attendanceModel = t.Object({
 export type Attendance = typeof attendanceModel.static;
 
 export const attendanceDetailsModel = t.Object({
+  user_id: t.Integer(),
   username: t.String(),
+  membership_id: t.Integer(),
   role: t.Enum({ owner: "owner", member: "member" }),
   color: t.String(),
   status: t.Enum({
@@ -70,3 +86,19 @@ export const attendanceDetailsModel = t.Object({
   }),
 });
 export type AttendanceDetails = typeof attendanceDetailsModel.static;
+
+export const attendanceUpdateModel = t.Object({
+  user_id: t.Integer(),
+  event_id: t.Integer(),
+  membership_id: t.Integer(),
+  status: t.Enum({
+    accepted: "accepted",
+    declined: "declined",
+    tentative: "tentative",
+    "needs-action": "needs-action",
+  }),
+});
+export type AttendanceUpdateModel = typeof attendanceUpdateModel.static;
+
+export const attendanceUpdateBody = t.Omit(attendanceUpdateModel, ["user_id"]);
+export type AttendanceUpdateBody = typeof attendanceUpdateBody.static;

@@ -1,4 +1,3 @@
-import { ColorBadge } from "@/components/ColorBadge";
 import { EditableField } from "@/components/EditableField";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -10,7 +9,6 @@ import { eventService } from "@/services/event";
 import {
   Bars3BottomLeftIcon,
   CheckIcon,
-  ChevronDownIcon,
   ClockIcon,
   HandThumbUpIcon,
   InformationCircleIcon,
@@ -28,15 +26,7 @@ import {
 import { format } from "date-fns";
 import { JSX, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Attendance } from "@/components/calendar/Attendance";
 
 type EventInfoProps = {
   event: Event;
@@ -55,8 +45,6 @@ export const EventInfo = ({
   const [isEditing, setIsEditing] = useState(false);
   const [temporaryEvent, setTemporaryEvent] = useState<Partial<Event>>({});
   const [attendances, setAttendances] = useState<AttendanceDetails[]>([]);
-  const [myAttendance, setMyAttendance] =
-    useState<AttendanceDetails["status"]>("needs-action");
 
   function patchEventInContext(partialEvent: Partial<Event>) {
     contextSetCalendarView((prev) => ({
@@ -158,31 +146,15 @@ export const EventInfo = ({
   }
 
   async function getAttendance() {
+    if (event.status === "tentative") return;
+
     const attendancesResult = await attendanceService.getAttendances(event.id);
     if (!attendancesResult) return;
 
+    console.log(attendancesResult);
+
     setAttendances(attendancesResult);
   }
-
-  function attendanceColor(status: AttendanceDetails["status"]): string {
-    switch (status) {
-      case "needs-action":
-        return ` #ffdd11`;
-      case "tentative":
-        return `rgb(177, 63, 252)`;
-      case "accepted":
-        return `rgb(16, 255, 143)`;
-      case "declined":
-        return `rgb(255, 17, 100)`;
-    }
-  }
-
-  const statusText: Record<AttendanceDetails["status"], string> = {
-    "needs-action": "Needs action",
-    tentative: "Tentative",
-    accepted: "Accepted",
-    declined: "Declined",
-  };
 
   useEffect(() => {
     if (!calendar.is_group) return;
@@ -290,52 +262,7 @@ export const EventInfo = ({
     {
       icon: HandThumbUpIcon,
       content: calendar.is_group ? (
-        <div className="flex flex-col gap-2 w-full">
-          {attendances?.map((attendance, index) => {
-            return (
-              <div
-                key={index}
-                className="flex items-center justify-between gap-2"
-              >
-                <div className="line-clamp-2 truncate whitespace-normal">
-                  {attendance.username}
-                </div>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="w-38 justify-start">
-                      <ChevronDownIcon className="w-4" />
-                      <ColorBadge
-                        text={statusText[myAttendance]}
-                        color={attendanceColor(myAttendance)}
-                      />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-48" align="start">
-                    <DropdownMenuLabel>Attendance</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuRadioGroup
-                      value={myAttendance}
-                      onValueChange={(value) =>
-                        setMyAttendance(value as AttendanceDetails["status"])
-                      }
-                    >
-                      <DropdownMenuRadioItem value="accepted">
-                        Accepted
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="declined">
-                        Declined
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="tentative">
-                        Tentative
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            );
-          })}
-        </div>
+        <Attendance attendances={attendances} event={event} />
       ) : undefined,
     },
   ];

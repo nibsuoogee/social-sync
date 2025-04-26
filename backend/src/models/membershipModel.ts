@@ -24,6 +24,16 @@ export const MembershipDTO = {
       AND user_id = ${user_id})`;
     return result.exists;
   },
+  userOwnsThisMembership: async (
+    membership_id: number,
+    user_id: number
+  ): Promise<boolean> => {
+    const [result] = await sql`
+      SELECT EXISTS(SELECT 1 FROM memberships 
+      WHERE id = ${membership_id} 
+      AND user_id = ${user_id})`;
+    return result.exists;
+  },
   getIdByUserAndCalendar: async (
     calendar_id: number,
     user_id: number
