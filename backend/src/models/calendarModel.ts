@@ -1,5 +1,5 @@
-import { t } from "elysia";
 import { sql } from "bun";
+import { t } from "elysia";
 import { eventModel } from "src/models/eventsModel";
 
 /**
@@ -97,14 +97,6 @@ export const CalendarDTO = {
       WHERE owner_user_id = ${ownerUserId} AND external_source_url IS NOT NULL
     `;
     return calendars;
-  },
-  findByCalendarId: async (calendarId: number): Promise<Event[]> => {
-    const events = await sql`
-      SELECT e.id, e.ics_uid FROM events e
-      JOIN events_calendars ec ON ec.events_id = e.id
-      WHERE ec.calendars_id = ${calendarId}
-    `;
-    return events;
   },
   updateLastSync: async (calendarId: number, date: Date): Promise<void> => {
     await sql`

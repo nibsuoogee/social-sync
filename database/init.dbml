@@ -70,6 +70,7 @@ Ref: memberships.user_id > users.id [delete: cascade]
 
 Table events {
   id integer [pk, increment, not null]
+  calendar_id int [not null]
   ics_uid varchar [unique, not null] // Unique ID from the .ics file (UID field)
   title varchar(255) [not null] // iCalendar SUMMARY
   description varchar(1000) [not null] // iCalendar DESCRIPTION
@@ -86,17 +87,8 @@ Table events {
   user_read_only boolean [default: false, not null] // imported events are read-only
 }
 Ref: events.proposed_by_user_id > users.id [delete: cascade]
+Ref: events.calendar_id > calendars.id [delete: cascade]
 
-Table "events_calendars" {
-  "events_id" integer
-  "calendars_id" integer
-
-  Indexes {
-    (events_id, calendars_id) [pk]
-  }
-}
-Ref: events_calendars.events_id > events.id [delete: cascade]
-Ref: events_calendars.calendars_id > calendars.id [delete: cascade]
 
 Table event_attendance {
   id integer [pk, increment, not null]
