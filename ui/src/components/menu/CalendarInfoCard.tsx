@@ -1,5 +1,5 @@
 import { Calendar } from "types";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { calendarService } from "@/services/calendar";
 import { useCalendarListContext } from "@/contexts/CalendarListContext";
 import { useNavigate } from "react-router-dom";
@@ -12,8 +12,8 @@ import {
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 import { getUserIdFromToken } from "@/lib/utils";
-import { EditableField } from "./EditableField";
-import { Input } from "./ui/input";
+import { EditableField } from "../EditableField";
+import { Input } from "../ui/input";
 import { HexColorPicker } from "react-colorful";
 
 /**

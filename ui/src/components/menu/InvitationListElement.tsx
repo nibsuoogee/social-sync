@@ -4,8 +4,8 @@
 import { UserGroupIcon } from "@heroicons/react/24/outline";
 
 import { NewInvitationsResponse } from "@types";
-import { Button } from "./ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Button } from "../ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { InvitationCard } from "./InvitationCard";
 
 export const InvitationListElement = ({

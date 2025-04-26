@@ -2,7 +2,7 @@
  * This is shown when a user wants to create a new calendar.
  */
 
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,8 +13,8 @@ import {
   FormItem,
   FormMessage,
   FormControl,
-} from "./ui/form";
-import { Input } from "./ui/input";
+} from "../ui/form";
+import { Input } from "../ui/input";
 import { calendarService } from "@/services/calendar";
 import { Calendar } from "@types";
 import { HexColorPicker } from "react-colorful";

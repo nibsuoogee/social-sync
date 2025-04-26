@@ -1,25 +1,25 @@
-import { CalendarList } from "@/components/CalendarList";
-import { useEffect, useState } from "react";
-import { Calendar, NewInvitationsResponse } from "@types";
-import {
-  PlusIcon,
-  ArrowDownIcon,
-  CalendarDaysIcon,
-} from "@heroicons/react/24/outline";
-import { InvitationsList } from "@/components/InvitationsList";
+import { CalendarList } from "@/components/menu/CalendarList";
+import { CreateCalendarCard } from "@/components/menu/CreateCalendarCard";
+import { ImportCalendarForm } from "@/components/menu/ImportCalendarForm";
+import { InvitationsList } from "@/components/menu/InvitationsList";
 import { Button } from "@/components/ui/button";
 import {
-  PopoverTrigger,
   Popover,
   PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
-import { CreateCalendarCard } from "@/components/CreateCalendarCard";
-import { calendarService } from "@/services/calendar";
-import { invitationService } from "@/services/invitation";
 import { CalendarListContext } from "@/contexts/CalendarListContext";
 import { InvitationListContext } from "@/contexts/InvitationListContext";
+import { calendarService } from "@/services/calendar";
+import { invitationService } from "@/services/invitation";
+import {
+  ArrowDownIcon,
+  CalendarDaysIcon,
+  PlusIcon,
+} from "@heroicons/react/24/outline";
+import { Calendar, NewInvitationsResponse } from "@types";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ImportCalendarForm } from "@/components/ImportCalendarForm";
 
 export const MainMenu = () => {
   const navigate = useNavigate();
