@@ -52,4 +52,11 @@ export const calendarService = {
       axios.delete(`${BACKEND_URL}/calendar/${calendar_id}`)
     );
   },
+  exportGroupCalendar: async (calendar_id: number) => {
+    return handleApiRequest<Blob>(() =>
+      axios.get(`${BACKEND_URL}/calendar/export/${calendar_id}`, {
+        responseType: "blob",
+      })
+    );
+  },
 };
