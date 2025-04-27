@@ -15,6 +15,8 @@ import {
 } from "@heroicons/react/24/outline";
 import { Event, GroupMemberInfo } from "@types";
 import { useEffect, useState } from "react";
+import { calendarService } from "@/services/calendar";
+import { saveAs } from "file-saver";
 
 export const CalendarOptions = ({ calendar_id }: { calendar_id: number }) => {
   const { contextCalendarView, contextSetCalendarView } = useEventsContext();
@@ -64,6 +66,18 @@ export const CalendarOptions = ({ calendar_id }: { calendar_id: number }) => {
         },
       ],
     }));
+  }
+
+  async function handleExportCalendar() {
+    try {
+      const response = await calendarService.exportGroupCalendar(calendar_id);
+      if (!response) {
+        throw new Error("No response received from the server.");
+      }
+      saveAs(response, `calendar-${calendar_id}.ics`); // Save the file with a meaningful name
+    } catch (error) {
+      console.error("Failed to export calendar:", error);
+    }
   }
 
   useEffect(() => {
@@ -127,6 +141,13 @@ export const CalendarOptions = ({ calendar_id }: { calendar_id: number }) => {
           <SparklesIcon className="size-6 ml-2" />
           <h3>Generate event proposal</h3>
         </Button>
+        <Button
+          onClick={() => handleExportCalendar()}
+          variant="outline"
+          className="flex items-center justify-start border-black"
+        >
+          <h3>Export group events from this calendar</h3>
+      </Button>
       </div>
     </div>
   );
