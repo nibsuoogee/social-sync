@@ -19,6 +19,7 @@ import {
 import {
   AttendanceDetails,
   Calendar,
+  CalendarViewRequest,
   Event,
   EventEditPermission,
   EventModelBody,
@@ -47,12 +48,12 @@ export const EventInfo = ({
   const [attendances, setAttendances] = useState<AttendanceDetails[]>([]);
 
   function patchEventInContext(partialEvent: Partial<Event>) {
-    contextSetCalendarView((prev) => ({
+    contextSetCalendarView((prev: CalendarViewRequest) => ({
       ...prev,
       mainCalendar: [
         {
           ...prev.mainCalendar[0],
-          events: prev.mainCalendar[0].events.map((e) => {
+          events: prev.mainCalendar[0].events.map((e: Event) => {
             if (e.id !== event.id) return e;
 
             return {
@@ -103,7 +104,7 @@ export const EventInfo = ({
     key: K,
     value: Event[K]
   ) {
-    setTemporaryEvent((prev) => {
+    setTemporaryEvent((prev: Partial<Event>) => {
       return {
         ...prev,
         [key]: value,
@@ -116,12 +117,14 @@ export const EventInfo = ({
     eventService.deleteEvent(event.id);
 
     // 2) remove the event from the context
-    contextSetCalendarView((prev) => ({
+    contextSetCalendarView((prev: CalendarViewRequest) => ({
       ...prev,
       mainCalendar: [
         {
           ...prev.mainCalendar[0],
-          events: prev.mainCalendar[0].events.filter((e) => e.id !== event.id),
+          events: prev.mainCalendar[0].events.filter(
+            (e: Event) => e.id !== event.id
+          ),
         },
       ],
     }));

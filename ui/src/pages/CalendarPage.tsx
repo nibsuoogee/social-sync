@@ -30,8 +30,11 @@ export const CalendarPage = ({ variant }: { variant: CalendarVariant }) => {
   } = useEventsContext();
 
   const mainCalendar = contextCalendarView.mainCalendar[0]?.calendar;
+
   const calendarsLoaded =
-    Object.values(contextCalendarView).findIndex((v) => v.length > 0) !== -1;
+    typeof mainCalendar !== "undefined" &&
+    typeof contextCalendarView.personalCalendars !== "undefined" &&
+    typeof contextCalendarView.groupMemberCalendars !== "undefined";
 
   async function getCalendarEvents() {
     if (typeof calendar_id === "undefined") return;

@@ -2,39 +2,40 @@ export type {
   UserModelForRegistration,
   UserModelForLogin,
   AccessToken,
-} from "../auth/src/models/userModel";
+} from "../auth/dist/models/userModel";
 
 export type {
   Calendar,
   CalendarCreateBody,
   CalendarUpdateBody,
   CalendarViewRequest,
-} from "../backend/src/models/calendarModel";
+  CalendarAndEvents,
+} from "../backend/dist/models/calendarModel";
 
 export type {
   Invitation,
   InvitationBody,
   InvitationUpdateBody,
   NewInvitationsResponse,
-} from "../backend/src/models/invitationsModel";
+} from "../backend/dist/models/invitationsModel";
 
 export type {
   Event,
   EventModelBody,
   EventUpdateBody,
-} from "../backend/src/models/eventsModel";
+} from "../backend/dist/models/eventsModel";
 
 export type {
   Attendance,
   AttendanceDetails,
   AttendanceUpdateBody,
-} from "../backend/src/models/attendanceModel";
+} from "../backend/dist/models/attendanceModel";
 
 export type {
   Membership,
   GroupMemberInfo,
   MembershipColorUpdateBody,
-} from "../backend/src/models/membershipModel";
+} from "../backend/dist/models/membershipModel";
 
 export type CalendarVariant = "single" | "fullPersonal" | "group";
 

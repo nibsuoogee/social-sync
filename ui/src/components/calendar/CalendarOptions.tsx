@@ -14,7 +14,12 @@ import {
   UserIcon,
   UserPlusIcon,
 } from "@heroicons/react/24/outline";
-import { Event, GroupMemberInfo } from "@types";
+import {
+  CalendarAndEvents,
+  CalendarViewRequest,
+  Event,
+  GroupMemberInfo,
+} from "@types";
 import { useEffect, useState } from "react";
 import { calendarService } from "@/services/calendar";
 import { saveAs } from "file-saver";
@@ -36,8 +41,8 @@ export const CalendarOptions = ({ calendar_id }: { calendar_id: number }) => {
 
   async function handleGenerateProposals() {
     const allEventsInView: ProcessorEvent[] = calendarViewKeys.flatMap((key) =>
-      contextCalendarView[key].flatMap((calendar) =>
-        calendar.events.flatMap((event) => ({
+      contextCalendarView[key].flatMap((calendar: CalendarAndEvents) =>
+        calendar.events.flatMap((event: Event) => ({
           id: event.id,
           start_time: event.start_time,
           end_time: event.end_time,
@@ -58,7 +63,7 @@ export const CalendarOptions = ({ calendar_id }: { calendar_id: number }) => {
       ...p,
     }));
 
-    contextSetCalendarView((prev) => ({
+    contextSetCalendarView((prev: CalendarViewRequest) => ({
       ...prev,
       mainCalendar: [
         {
