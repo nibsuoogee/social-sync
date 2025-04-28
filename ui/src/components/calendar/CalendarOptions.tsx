@@ -147,7 +147,7 @@ export const CalendarOptions = ({ calendar_id }: { calendar_id: number }) => {
           className="flex items-center justify-start border-black"
         >
           <h3>Export group events from this calendar</h3>
-      </Button>
+        </Button>
       </div>
     </div>
   );

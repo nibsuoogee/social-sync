@@ -1,4 +1,4 @@
-import { tryCatch } from "@shared/src/tryCatch";
+import { tryCatch } from "@utils/tryCatch";
 import { randomUUIDv7 } from "bun";
 import { Elysia, t } from "elysia";
 import {

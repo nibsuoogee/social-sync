@@ -13,8 +13,8 @@ import {
   MembershipModelForCreation,
 } from "../models/membershipModel";
 import { CalendarDTO, calendarModel } from "src/models/calendarModel";
-import { tryCatch } from "@shared/src/tryCatch";
-import { getRandomColor } from "@shared/src/util/random";
+import { tryCatch } from "@utils/tryCatch";
+import { getRandomColor } from "src/utils/random";
 
 export const inviteRouter = new Elysia()
   .use(jwtConfig)

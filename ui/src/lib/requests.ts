@@ -1,5 +1,5 @@
 import { reportThisError } from "@/lib/logger";
-import { tryCatch } from "../../../shared/src/tryCatch";
+import { tryCatch } from "@/lib/tryCatch";
 import { AxiosResponse } from "axios";
 
 /**

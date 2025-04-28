@@ -6,8 +6,8 @@ import {
   AttendanceDTO,
   attendanceUpdateBody,
 } from "src/models/attendanceModel";
-import { tryCatch } from "@shared/src/tryCatch";
 import { MembershipDTO } from "src/models/membershipModel";
+import { tryCatch } from "@utils/tryCatch";
 
 export const attendanceRouter = new Elysia()
   .use(jwtConfig)

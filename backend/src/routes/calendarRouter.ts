@@ -18,10 +18,10 @@ import {
   membershipModel,
   MembershipModelForCreation,
 } from "src/models/membershipModel";
-import { getRandomColor } from "@shared/src/util/random";
-import { tryCatch } from "@shared/src/tryCatch";
+import { tryCatch } from "@utils/tryCatch";
 import { Event, EventDTO, eventModel } from "src/models/eventsModel";
 import { deepCopy } from "src/utils/objects";
+import { getRandomColor } from "src/utils/random";
 
 /**
  * Get all the calendars for a specific user
