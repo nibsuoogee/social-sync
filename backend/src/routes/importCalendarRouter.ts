@@ -13,7 +13,7 @@ import {
 } from "../models/calendarModel";
 import { MembershipDTO, membershipModel } from "../models/membershipModel";
 import { tryCatch } from "@utils/tryCatch";
-import { getRandomColor } from "src/utils/random";
+import { getRandomColor } from "@utils/random";
 
 export const calendarUrlImportRouter = new Elysia()
   .use(jwtConfig)

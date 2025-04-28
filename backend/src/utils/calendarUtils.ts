@@ -3,7 +3,7 @@ import { RRule } from "rrule";
 import { EventDTO } from "../models/eventsModel";
 import { tryCatch } from "@utils/tryCatch";
 import { Event } from "../models/eventsModel";
-import { Calendar } from "src/models/calendarModel";
+import { Calendar } from "@models/calendarModel";
 
 export const filterUpcomingEvents = (events: VEvent[], daysAhead: number) => {
   const now = new Date();

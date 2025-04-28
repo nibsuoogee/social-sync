@@ -6,7 +6,7 @@ import {
   eventModel,
   eventModelBody,
   eventUpdateBody,
-} from "src/models/eventsModel";
+} from "@models/eventsModel";
 import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
 

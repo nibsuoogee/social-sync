@@ -1,27 +1,26 @@
-import Elysia, { Context, t } from "elysia";
+import { Event, EventDTO } from "@models/eventsModel";
+import {
+  MembershipDTO,
+  membershipModel,
+  MembershipModelForCreation,
+} from "@models/membershipModel";
+import { deepCopy } from "@utils/objects";
+import { getRandomColor } from "@utils/random";
+import { tryCatch } from "@utils/tryCatch";
+import Elysia, { t } from "elysia";
 import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
 import {
   Calendar,
   CalendarAndEvents,
-  CalendarDTO,
-  CalendarModelForCreation,
-  calendarAndEvents,
   calendarCreateBody,
+  CalendarDTO,
   calendarModel,
+  CalendarModelForCreation,
   calendarUpdateBody,
   calendarViewRequest,
   defaultCalendar,
 } from "../models/calendarModel";
-import {
-  MembershipDTO,
-  membershipModel,
-  MembershipModelForCreation,
-} from "src/models/membershipModel";
-import { tryCatch } from "@utils/tryCatch";
-import { Event, EventDTO, eventModel } from "src/models/eventsModel";
-import { deepCopy } from "src/utils/objects";
-import { getRandomColor } from "src/utils/random";
 
 /**
  * Get all the calendars for a specific user

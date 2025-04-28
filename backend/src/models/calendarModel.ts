@@ -1,6 +1,6 @@
 import { sql } from "bun";
 import { t } from "elysia";
-import { eventModel } from "src/models/eventsModel";
+import { eventModel } from "@models/eventsModel";
 
 /**
  * Calendar Data Transfer Object

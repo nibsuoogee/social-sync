@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import ical, { VEvent } from "node-ical";
 
-import { EventDTO } from "src/models/eventsModel";
+import { EventDTO } from "@models/eventsModel";
 import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
 import { CalendarDTO } from "../models/calendarModel";
