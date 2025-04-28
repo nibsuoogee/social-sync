@@ -4,9 +4,6 @@ COPY backend/package*.json .
 RUN bun install
 COPY backend/. .
 
-# Copy shared code into a subfolder inside the image
-COPY shared/src ../shared/src
-
 # Install nodemon globally
 RUN bun add -g nodemon
 

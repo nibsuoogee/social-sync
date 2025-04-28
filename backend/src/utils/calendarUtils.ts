@@ -1,9 +1,9 @@
 import { VEvent } from "node-ical";
 import { RRule } from "rrule";
 import { EventDTO } from "../models/eventsModel";
-import { tryCatch } from "@shared/src/tryCatch";
+import { tryCatch } from "@utils/tryCatch";
 import { Event } from "../models/eventsModel";
-import { Calendar } from "src/models/calendarModel";
+import { Calendar } from "@models/calendarModel";
 
 export const filterUpcomingEvents = (events: VEvent[], daysAhead: number) => {
   const now = new Date();
@@ -86,30 +86,30 @@ export const addOrUpdateEvent = async (
 };
 
 export const createIcsFile = (events: Event[], calendar: Calendar): string => {
+  const fmt = (d: Date | null | undefined) =>
+    d ? new Date(d).toISOString().replace(/[-:]/g, "").split(".")[0] : "";
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "CALSCALE:GREGORIAN",
+    `X-WR-CALNAME:${calendar.name}`,
+    `X-WR-CALDESC:${calendar.description}`,
+  ];
 
-    const fmt = (d: Date | null | undefined) => d ? new Date(d).toISOString().replace(/[-:]/g, "").split(".")[0] : "";
-    const lines = [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "CALSCALE:GREGORIAN",
-      `X-WR-CALNAME:${calendar.name}`,
-      `X-WR-CALDESC:${calendar.description}`,
-    ];
-  
-    events.forEach((event) => {
-      lines.push(
-        "BEGIN:VEVENT",
-        `UID:${event.ics_uid}`,
-        `SUMMARY:${event.title || ""}`,
-        `DESCRIPTION:${event.description || ""}`,
-        `LOCATION:${event.location || ""}`,
-        `DTSTART:${fmt(event.start_time)}`,
-        `DTEND:${fmt(event.end_time)}`,
-        `STATUS:${event.status || ""}`,
-        "END:VEVENT"
-      );
-    });
-  
-    lines.push("END:VCALENDAR");
-    return lines.join("\r\n");
-  };
+  events.forEach((event) => {
+    lines.push(
+      "BEGIN:VEVENT",
+      `UID:${event.ics_uid}`,
+      `SUMMARY:${event.title || ""}`,
+      `DESCRIPTION:${event.description || ""}`,
+      `LOCATION:${event.location || ""}`,
+      `DTSTART:${fmt(event.start_time)}`,
+      `DTEND:${fmt(event.end_time)}`,
+      `STATUS:${event.status || ""}`,
+      "END:VEVENT"
+    );
+  });
+
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n");
+};

@@ -12,8 +12,8 @@ import {
   CalendarModelForCreation,
 } from "../models/calendarModel";
 import { MembershipDTO, membershipModel } from "../models/membershipModel";
-import { tryCatch } from "@shared/src/tryCatch";
-import { getRandomColor } from "@shared/src/util/random";
+import { tryCatch } from "@utils/tryCatch";
+import { getRandomColor } from "@utils/random";
 
 export const calendarUrlImportRouter = new Elysia()
   .use(jwtConfig)

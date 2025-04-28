@@ -1,4 +1,4 @@
-import { tryCatch } from "@shared/src/tryCatch";
+import { tryCatch } from "@utils/tryCatch";
 import { randomUUIDv7 } from "bun";
 import { Elysia, t } from "elysia";
 import {
@@ -6,7 +6,7 @@ import {
   eventModel,
   eventModelBody,
   eventUpdateBody,
-} from "src/models/eventsModel";
+} from "@models/eventsModel";
 import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
 

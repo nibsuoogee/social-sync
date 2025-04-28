@@ -24,7 +24,6 @@
 
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["../shared/*"],
       "@backend/*": ["../backend/*"],
       "@auth/*": ["../auth/*"],
       "@types": ["./types.ts"],
@@ -32,9 +31,5 @@
     }
   },
   "include": ["src"],
-  "references": [
-    { "path": "../shared" },
-    { "path": "../backend" },
-    { "path": "../auth" }
-  ]
+  "references": [{ "path": "../backend" }, { "path": "../auth" }]
 }

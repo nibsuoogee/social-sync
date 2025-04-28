@@ -7,7 +7,7 @@ import {
   MembershipDTO,
   membershipModel,
 } from "../models/membershipModel";
-import { tryCatch } from "@shared/src/tryCatch";
+import { tryCatch } from "@utils/tryCatch";
 
 export const membershipsRouter = new Elysia()
   .use(jwtConfig)
