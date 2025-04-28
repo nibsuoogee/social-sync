@@ -8,6 +8,7 @@ import { cn, deepCopy } from "@/lib/utils";
 import { membershipService } from "@/services/memberships";
 import { ProcessorEvent, processorService } from "@/services/processor";
 import {
+  FolderArrowDownIcon,
   PaintBrushIcon,
   SparklesIcon,
   UserIcon,
@@ -146,7 +147,8 @@ export const CalendarOptions = ({ calendar_id }: { calendar_id: number }) => {
           variant="outline"
           className="flex items-center justify-start border-black"
         >
-          <h3>Export group events from this calendar</h3>
+          <FolderArrowDownIcon className="size-6 ml-2" />
+          <h3>Export group events</h3>
         </Button>
       </div>
     </div>
