@@ -100,6 +100,8 @@ export const CalendarCell = (props: DayProps) => {
                 contextCalendarVariant === "group" &&
                 view === "personalCalendars"
                   ? "navigateFullPersonal"
+                  : contextCalendarVariant === "single" && event.user_read_only
+                  ? "restrict"
                   : calendarViewPermissions[view]
               }
             />
@@ -155,8 +157,13 @@ export const CalendarCell = (props: DayProps) => {
 
   const showingMaxEvents = visibleEvents.length === MAX_VISIBLE_EVENTS;
 
+  const externalSourceUrl =
+    contextCalendarView?.mainCalendar[0]?.calendar.external_source_url;
+  const calendarIsImported =
+    typeof externalSourceUrl === "string" && externalSourceUrl.length > 0;
+
   const canAddEvent =
-    contextCalendarVariant !== "fullPersonal"
+    contextCalendarVariant !== "fullPersonal" && !calendarIsImported
       ? noEventsInCell
         ? true
         : showingMaxEvents
