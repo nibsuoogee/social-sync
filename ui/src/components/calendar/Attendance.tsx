@@ -26,6 +26,7 @@ function attendanceColor(status: AttendanceDetails["status"]): string {
     case "declined":
       return `rgb(255, 17, 100)`;
   }
+  return "#000000";
 }
 
 const statusText: Record<AttendanceDetails["status"], string> = {

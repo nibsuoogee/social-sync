@@ -53,7 +53,7 @@ export const CalendarInfoCard = ({ calendar }: { calendar: Calendar }) => {
     key: K,
     value: Calendar[K]
   ) {
-    setTemporaryInfo((prev) => {
+    setTemporaryInfo((prev: Partial<Calendar>) => {
       return {
         ...prev,
         [key]: value,

@@ -12,7 +12,12 @@ import {
 } from "@/lib/defaultObjects";
 import { eventService } from "@/services/event";
 import { CalendarAndEvents } from "@/services/calendar";
-import { CalendarViewKey, EventEditPermission } from "@types";
+import {
+  CalendarViewKey,
+  CalendarViewRequest,
+  Event,
+  EventEditPermission,
+} from "@types";
 
 const MAX_VISIBLE_EVENTS = 3;
 
@@ -43,7 +48,7 @@ export const CalendarCell = (props: DayProps) => {
 
   const filterCalendarToday = (calendarAndEvents: CalendarAndEvents[]) =>
     calendarAndEvents.map((cal) => {
-      const filteredEvents = cal.events.filter((e) => {
+      const filteredEvents = cal.events.filter((e: Event) => {
         const eventDate = new Date(e.start_time); // ISO string -> Date object
 
         if (isSameDate(eventDate, props.date)) return true;
@@ -69,46 +74,49 @@ export const CalendarCell = (props: DayProps) => {
   // Add all events from all calendars as eventblocks to array
   // and then take a slice
   const allEventBlocksFiltered = calendarViewKeys.flatMap((view) =>
-    dayCalendars[view].flatMap((filtered, calendarIndex) => {
-      const { calendar, events } = filtered;
+    dayCalendars[view].flatMap(
+      (filtered: CalendarAndEvents, calendarIndex: number) => {
+        const { calendar, events } = filtered;
 
-      const sortedEvents = events.sort(function (a, b) {
-        if (a.all_day && !b.all_day) return -1;
-        if (!a.all_day && b.all_day) return 1;
+        const sortedEvents = events.sort(function (a: Event, b: Event) {
+          if (a.all_day && !b.all_day) return -1;
+          if (!a.all_day && b.all_day) return 1;
 
-        return (
-          new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
-        );
-      });
+          return (
+            new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+          );
+        });
 
-      return sortedEvents.map((event) => {
-        return (
-          <div key={`${view}-${calendarIndex}-${event.id}`}>
-            <EventBlock
-              event={event}
-              calendar={calendar}
-              bgColor={calendar.color}
-              customClass="min-h-6 max-h-10 h-min"
-              borderStyle={
-                event.status === "tentative"
-                  ? "dashed"
-                  : calendar.is_group
-                  ? "solid"
-                  : ""
-              }
-              editPermission={
-                contextCalendarVariant === "group" &&
-                view === "personalCalendars"
-                  ? "navigateFullPersonal"
-                  : contextCalendarVariant === "single" && event.user_read_only
-                  ? "restrict"
-                  : calendarViewPermissions[view]
-              }
-            />
-          </div>
-        );
-      });
-    })
+        return sortedEvents.map((event: Event) => {
+          return (
+            <div key={`${view}-${calendarIndex}-${event.id}`}>
+              <EventBlock
+                event={event}
+                calendar={calendar}
+                bgColor={calendar.color}
+                customClass="min-h-6 max-h-10 h-min"
+                borderStyle={
+                  event.status === "tentative"
+                    ? "dashed"
+                    : calendar.is_group
+                    ? "solid"
+                    : ""
+                }
+                editPermission={
+                  contextCalendarVariant === "group" &&
+                  view === "personalCalendars"
+                    ? "navigateFullPersonal"
+                    : contextCalendarVariant === "single" &&
+                      event.user_read_only
+                    ? "restrict"
+                    : calendarViewPermissions[view]
+                }
+              />
+            </div>
+          );
+        });
+      }
+    )
   );
 
   useEffect(() => {
@@ -128,14 +136,14 @@ export const CalendarCell = (props: DayProps) => {
   }
 
   function nextPage() {
-    setFirstVisibleEvent((prev) => {
+    setFirstVisibleEvent((prev: number | undefined) => {
       if (typeof prev === "undefined") return undefined;
       return prev + MAX_VISIBLE_EVENTS;
     });
   }
 
   function previousPage() {
-    setFirstVisibleEvent((prev) => {
+    setFirstVisibleEvent((prev: number | undefined) => {
       if (typeof prev === "undefined") return undefined;
       return prev - MAX_VISIBLE_EVENTS;
     });
@@ -191,7 +199,7 @@ export const CalendarCell = (props: DayProps) => {
     if (!response) return;
 
     // 3) add the full event to the mainCalendar
-    contextSetCalendarView((prev) => ({
+    contextSetCalendarView((prev: CalendarViewRequest) => ({
       ...prev,
       mainCalendar: [
         {

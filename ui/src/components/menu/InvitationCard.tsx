@@ -39,7 +39,7 @@ export const InvitationCard = ({
         {invitation.description}
       </h2>
       <h2 className="font-mono italic text-left mb-2">Members:</h2>
-      {invitation.members.map((member) => (
+      {invitation.members.map((member: { username: string; email: string }) => (
         <div key={member.email} className="flex gap-1 items-center">
           <UserIcon className="h-6 w-6" />
           <h2 className="font-mono text-sm text-left mb-2">

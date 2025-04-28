@@ -43,3 +43,4 @@ package-lock.json
 
 # typescript
 /dist
+tsconfig.tsbuildinfo
