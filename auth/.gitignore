@@ -42,5 +42,4 @@ package-lock.json
 **/*.bun
 
 # typescript
-/dist
 tsconfig.tsbuildinfo
