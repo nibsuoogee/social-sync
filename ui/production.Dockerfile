@@ -8,11 +8,9 @@ RUN bun install
 COPY ui/. .
 
 # Copy backend model types
-COPY backend/dist/models ../backend/dist/models
-COPY backend/tsconfig.json ../backend/tsconfig.json
+COPY auth/dist/models ../auth/dist/models
 
 # Copy auth model types
-COPY auth/dist/models ../auth/dist/models
-COPY auth/tsconfig.json ../auth/tsconfig.json
+COPY backend/dist/models ../backend/dist/models
 
 RUN bun run build
