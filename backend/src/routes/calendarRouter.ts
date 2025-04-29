@@ -10,6 +10,7 @@ import { tryCatch } from "@utils/tryCatch";
 import Elysia, { t } from "elysia";
 import { jwtConfig } from "../config/jwtConfig";
 import { authorizationMiddleware } from "../middleware/authorization";
+import { httpRequestDuration } from "../metrics";
 import {
   Calendar,
   CalendarAndEvents,
@@ -162,12 +163,23 @@ export const calendarRouter = new Elysia()
         .get(
           "/calendars",
           async ({ user, error }) => {
+            const startTime = Date.now();
             // 1) get the calendars which the user has a membership for
             const [calendars, err] = await tryCatch(
               CalendarDTO.getCalendars(user.id)
             );
             if (err) return error(500, err.message);
             if (!calendars) return error(500, "Failed to get calendars");
+
+            const duration = Date.now() - startTime;
+            // Log the duration of the request
+            httpRequestDuration
+                .labels({
+                    method: "GET",
+                    route: "/calendars",
+                    code: "200"
+                })
+                .observe(duration);
 
             return calendars;
           },

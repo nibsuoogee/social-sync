@@ -10,10 +10,18 @@ import { syncCalendarRouter } from "./routes/syncCalendarRouter";
 import { membershipsRouter } from "./routes/membershipsRouter";
 import { attendanceRouter } from "./routes/attendanceRouter";
 import { exportCalendarRouter } from "./routes/exportCalendarRouter";
+import { register } from "./metrics";
 
 const app = new Elysia()
   .use(swagger())
   .use(cors())
+  .get("/metrics", async () => {
+    return new Response(await register.metrics(), {
+        headers: {
+            "Content-Type": register.contentType
+        }
+    });
+  })
   .get("/", () => "Hello Elysia")
   .use(protectedRouter)
   .use(inviteRouter)
