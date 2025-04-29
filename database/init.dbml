@@ -1,0 +1,110 @@
+// This file contains the original definition of the database
+
+// Copy and paste this file to https://dbdiagram.io/d to visualize
+// and export a new init.sql file
+
+// Docs: https://dbml.dbdiagram.io/docs
+
+Enum "membership_role" {
+  "owner"
+  "member"
+}
+
+Enum "event_status" {
+  "confirmed"
+  "tentative"
+  "cancelled"
+}
+
+Enum "attendance_status" {
+  "accepted"
+  "declined"
+  "tentative"
+  "needs-action"
+}
+
+Enum "invitation_status" {
+  "accepted"
+  "declined"
+  "needs-action"
+}
+
+Enum "sync_status" {
+  "inactive"
+  "active"
+  "failed"
+}
+
+Table users {
+  id integer [pk, increment, not null]
+  username varchar(50) [not null]
+  email varchar(255) [not null]
+  password varchar(255) [not null]
+  created_at timestamp [default: `now()`, not null]
+}
+
+Table calendars {
+  id integer [pk, increment, not null]
+  name varchar(255) [not null]
+  description varchar(1000) [not null]
+  owner_user_id integer // NULL if it's a group calendar
+  is_group boolean [default: false, not null]
+  created_at timestamp [default: `now()`, not null]
+  color varchar(7) [not null] // The colour of the calendar
+  external_source_name varchar(255) // e.g., "Google Calendar"
+  external_source_url varchar(1000) // iCalendar SOURCE URL
+  external_last_sync timestamp // Last sync time
+  external_sync_status "sync_status" [default: 'inactive', not null] // Sync state
+}
+Ref: calendars.owner_user_id > users.id [delete: cascade]
+
+Table memberships {
+  id integer [pk, increment, not null]
+  calendar_id int [not null]
+  user_id int [not null]
+  role "membership_role" [not null]
+  color varchar(7) [not null] // The colour everyone will see a user's events as in a group
+}
+Ref: memberships.calendar_id > calendars.id [delete: cascade]
+Ref: memberships.user_id > users.id [delete: cascade]
+
+Table events {
+  id integer [pk, increment, not null]
+  calendar_id int [not null]
+  ics_uid varchar [unique, not null] // Unique ID from the .ics file (UID field)
+  title varchar(255) [not null] // iCalendar SUMMARY
+  description varchar(1000) [not null] // iCalendar DESCRIPTION
+  location varchar(255) [not null] // iCalendar LOCATION
+  start_time timestamp [not null] // iCalendar DTSTART
+  end_time timestamp [not null] // iCalendar DTEND
+  timezone varchar(2000) [default: 'UTC', not null] // iCalendar TZID
+  all_day boolean [default: false, not null] // iCalendar VALUE=DATE (all-day events)
+  recurrence_rule text // iCalendar RRULE (for repeating events)
+  status "event_status" [default: 'confirmed', not null] // iCalendar STATUS
+  created_at timestamp [default: `now()`, not null] // iCalendar CREATED
+  updated_at timestamp [default: `now()`, not null] // iCalendar LAST-MODIFIED
+  proposed_by_user_id int [not null] // User who created/imported the event
+  user_read_only boolean [default: false, not null] // imported events are read-only
+}
+Ref: events.proposed_by_user_id > users.id [delete: cascade]
+Ref: events.calendar_id > calendars.id [delete: cascade]
+
+
+Table event_attendance {
+  id integer [pk, increment, not null]
+  event_id int [not null]
+  membership_id int [not null]
+  status "attendance_status" [default: 'needs-action', not null] // iCalendar PARTSTAT
+}
+Ref: event_attendance.event_id > events.id [delete: cascade]
+Ref: event_attendance.membership_id > memberships.id [delete: cascade]
+
+Table invitations {
+  id integer [pk, increment, not null]
+  calendar_id int [not null]
+  user_id int [not null]
+  status invitation_status [default: 'needs-action', not null]
+  created_at timestamp [default: `now()`, not null]
+}
+Ref: invitations.calendar_id > calendars.id [delete: cascade]
+Ref: invitations.user_id > users.id [delete: cascade]
