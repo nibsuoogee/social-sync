@@ -1,4 +1,4 @@
-import { PROCESSOR_URL } from "@/lib/constants";
+import { PROCESSOR_URL } from "@/lib/urls";
 import { handleApiRequest } from "@/lib/requests";
 import axios from "axios";
 

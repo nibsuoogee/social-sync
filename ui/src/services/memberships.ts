@@ -1,4 +1,4 @@
-import { BACKEND_URL } from "@/lib/constants";
+import { BACKEND_URL } from "@/lib/urls";
 import { handleApiRequest } from "@/lib/requests";
 import { GroupMemberInfo, Membership, MembershipColorUpdateBody } from "@types";
 import axios from "axios";

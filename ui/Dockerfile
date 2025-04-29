@@ -7,12 +7,10 @@ RUN bun install
 COPY ui/. .
 
 # Copy backend model types
-COPY backend/src/models ../backend/src/models
-COPY backend/tsconfig.json ../backend/tsconfig.json
+COPY auth/dist/models ../auth/dist/models
 
 # Copy auth model types
-COPY auth/src/models ../auth/src/models
-COPY auth/tsconfig.json ../auth/tsconfig.json
+COPY backend/dist/models ../backend/dist/models
 
 # Install nodemon globally
 RUN bun add -g nodemon
