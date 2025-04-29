@@ -1,8 +1,8 @@
 FROM oven/bun:1.2.7
 WORKDIR /usr/src/app
-COPY auth/package*.json .
+COPY package*.json .
 RUN bun install
-COPY auth/. .
+COPY . .
 
 # Install nodemon globally
 RUN bun add -g nodemon

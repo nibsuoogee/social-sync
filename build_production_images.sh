@@ -3,15 +3,7 @@
 # Builds the docker images for the project
 echo "Starting to build the docker images..."
 
-echo "Building types for ui from auth and backend"
-cd auth
-bun tsc -p tsconfig.json
-
-cd ../backend
-bun tsc -p tsconfig.json
-
-cd ..
-echo "Done building types"
+./build_ui_types.sh
 
 echo "building project-auth:prod..."
 docker build -f auth/production.Dockerfile -t project-auth:prod auth/

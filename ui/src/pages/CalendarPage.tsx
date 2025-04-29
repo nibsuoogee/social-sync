@@ -32,7 +32,7 @@ export const CalendarPage = ({ variant }: { variant: CalendarVariant }) => {
   const mainCalendar = contextCalendarView.mainCalendar[0]?.calendar;
 
   const calendarsLoaded =
-    typeof mainCalendar !== "undefined" &&
+    typeof contextCalendarView.mainCalendar !== "undefined" &&
     typeof contextCalendarView.personalCalendars !== "undefined" &&
     typeof contextCalendarView.groupMemberCalendars !== "undefined";
 
