@@ -1,4 +1,4 @@
-import { BACKEND_URL } from "@/lib/constants";
+import { BACKEND_URL } from "@/lib/urls";
 import { handleApiRequest } from "@/lib/requests";
 import axios from "axios";
 import { Calendar, CalendarCreateBody, Event, Membership } from "@types";
